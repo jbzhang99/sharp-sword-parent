@@ -1,0 +1,64 @@
+ <#body>
+    <div >
+        <!-- =========================================================动态表单========================================================= -->
+        <div class="easyui-panel" style="width:100%;" align="center">
+            <#dynaForm/>
+        </div>
+    </div>
+    <!-- ====================================================================================================================== -->
+    <!-- style & script 分隔线 -->
+    <!-- ====================================================================================================================== -->
+    <script type="text/javascript">
+        function openUpdate(){
+            var formData = {
+            <% for (actControl in actControls) {
+                if (actControl.value != null) {%>
+                    ${actControl.name}:'${actControl.value}',
+                <%
+                }
+            }%>
+            };
+            $('#form').form('load', formData);
+        }
+
+        function submit(){
+            if(!$('#form').form("validate")){
+                return;
+            }
+            $("#submitBtn").linkbutton("disable");
+            var formData = $("#form").serializeObject();
+            <% if(processDefinitionId != null){%>
+                formData._processDefinitionId = '${processDefinitionId}';
+            <%}else if(taskId != null){%>
+                formData._taskId = '${taskId}';
+            <%}%>
+            $.ajax({
+                type: "POST",
+                url: "${contextPath}/actControl/submit.action",
+                data: formData,
+                processData:true,
+                dataType: "json",
+                async : true,
+                success: function (data) {
+                    $("#submitBtn").linkbutton("enable");
+                    if(data.code=="200"){
+                        swal('成功',data.result, 'success');
+                    }else{
+                        swal('错误',data.result, 'error');
+                    }
+                },
+                error: function(){
+                    $("#submitBtn").linkbutton("enable");
+                    swal('错误', '远程访问失败', 'error');
+                }
+            });
+        }
+
+        /**
+         * 页面启动加载
+         */
+        $(function () {
+            openUpdate();
+        })
+    </script>
+</#body>
