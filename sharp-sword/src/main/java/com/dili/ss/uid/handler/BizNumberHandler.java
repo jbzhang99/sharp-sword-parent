@@ -29,10 +29,11 @@ public class BizNumberHandler {
     private BizNumberManager bizNumberManager;
 
     @PostConstruct
-    public void init() throws IllegalAccessException, InstantiationException {
-//        B.b.dae("");
-//        bizNumberManager = (BizNumberManager)((Class)B.b.g("clazz")).newInstance();
-        bizNumberManager = new BizNumberManagerImpl();
+    public void init() {
+        try {
+            bizNumberManager = (BizNumberManager)((Class)B.b.g("bizNumberManagerImpl")).newInstance();
+        } catch (Exception e) {
+        }
         bizNumberManager.setBizNumberComponent(bizNumberComponent);
         bizNumberManager.setFixedStep(fixedStep);
         bizNumberManager.setRangeStep(rangeStep);

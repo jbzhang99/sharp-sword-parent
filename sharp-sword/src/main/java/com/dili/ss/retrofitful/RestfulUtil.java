@@ -1,8 +1,10 @@
 package com.dili.ss.retrofitful;
 
+import com.dili.http.okhttp.utils.B;
 import com.dili.ss.retrofitful.annotation.Restful;
 import org.apache.commons.lang3.StringUtils;
 
+import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
 
 /**
@@ -20,8 +22,16 @@ public class RestfulUtil {
             //baseUrl或value必填
             throw new RuntimeException("@Restful注解的baseUrl或value必填");
         }
-        return (T) Proxy.newProxyInstance(clazz.getClassLoader(),
-                new Class<?>[] { clazz }, new RestfulInterfaceHandler<T>(clazz));
+        try {
+            Object interfaceHandler = B.b.g("interfaceHandler");
+            if(interfaceHandler == null){
+                return null;
+            }
+            return (T) Proxy.newProxyInstance(clazz.getClassLoader(),
+                    new Class<?>[] { clazz }, (InvocationHandler)((Class)interfaceHandler).getConstructor(Class.class).newInstance(clazz));
+        } catch (Exception e) {
+            return null;
+        }
 
     }
 

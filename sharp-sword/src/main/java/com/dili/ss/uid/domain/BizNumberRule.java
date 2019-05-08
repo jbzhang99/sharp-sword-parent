@@ -1,12 +1,7 @@
 package com.dili.ss.uid.domain;
 
 import com.dili.ss.dto.IDTO;
-import com.dili.ss.metadata.FieldEditor;
-import com.dili.ss.metadata.annotation.EditMode;
 import com.dili.ss.metadata.annotation.FieldDef;
-
-import javax.persistence.Column;
-import java.util.Date;
 
 /**
  * 业务号规则
