@@ -407,14 +407,6 @@
             <version>4.5.5</version>
         </dependency>
 
-        <!--quartz-->
-        <dependency>
-            <groupId>org.quartz-scheduler</groupId>
-            <artifactId>quartz</artifactId>
-            <version>2.3.0</version>
-            <scope>provided</scope>
-        </dependency>
-
         <!-- https://mvnrepository.com/artifact/org.dom4j/dom4j -->
         <!--<dependency>-->
             <!--<groupId>org.dom4j</groupId>-->

@@ -148,6 +148,21 @@ function bindMetadata(gridId, isClearQueryParams, isTreegrid){
  * @param formId
  * @returns {*}
  */
+function bindGridMeta2FormData(gridId, formId, json, containsNull){
+    var formData = bindGridMeta2Form(gridId, formId, containsNull);
+    if(!json || json == null || json === "" || !isJson(json)) {
+        return formData;
+    }
+    return $.extend({}, formData, json);
+}
+
+/**
+ * 为表单绑定表格的metadata，保持原有的meta信息
+ * 返回绑定好的对象
+ * @param gridId
+ * @param formId
+ * @returns {*}
+ */
 function bindGridMeta2Form(gridId, formId, containsNull){
     var param = bindMetadata(gridId, true);
     if(!formId || formId == null || formId === "") return param;
