@@ -1,6 +1,7 @@
-package com.dili.ss.service;
+package com.dili.ss.idempotent.service;
 
-import com.dili.ss.servlet.dto.TokenPair;
+
+import com.dili.ss.idempotent.dto.TokenPair;
 
 public interface IdempotentTokenService {
 
@@ -9,7 +10,7 @@ public interface IdempotentTokenService {
      * @param url
      * @return key: url + tokenValue, value: tokenValue
      */
-    TokenPair getToken (String url);
+    TokenPair getToken(String url);
 
 
 }

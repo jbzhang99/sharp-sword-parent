@@ -1,6 +1,6 @@
-package com.dili.ss.servlet.aop;
+package com.dili.ss.idempotent.aop;
 
-import com.dili.ss.service.IdempotentTokenService;
+import com.dili.ss.idempotent.service.IdempotentTokenService;
 import com.dili.ss.util.RedisDistributedLock;
 import org.aspectj.lang.ProceedingJoinPoint;
 

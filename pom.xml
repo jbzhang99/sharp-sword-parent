@@ -16,6 +16,7 @@
 		<module>ss-activiti</module>
 		<module>ss-scheduler</module>
 		<module>ss-uid</module>
+		<module>ss-idempotent</module>
 	</modules>
 
 	<properties>

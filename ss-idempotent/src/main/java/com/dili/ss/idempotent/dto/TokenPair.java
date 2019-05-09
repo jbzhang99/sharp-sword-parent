@@ -1,4 +1,4 @@
-package com.dili.ss.servlet.dto;
+package com.dili.ss.idempotent.dto;
 
 /**
  * token值对

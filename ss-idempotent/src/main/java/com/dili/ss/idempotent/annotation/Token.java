@@ -1,4 +1,4 @@
-package com.dili.ss.servlet.annotation;
+package com.dili.ss.idempotent.annotation;
 
 import org.springframework.core.annotation.AliasFor;
 
