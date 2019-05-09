@@ -25,7 +25,7 @@ public class InitConfig {
             return;
         }
         isInit = true;
-        List<String>  ss = B.gif("script/i.ini");
+        List<String>  ss = B.gif("script/i");
         ss.parallelStream().forEach(s -> {
             if(StringUtils.isBlank(s)){
                 return;
