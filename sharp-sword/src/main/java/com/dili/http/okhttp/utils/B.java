@@ -3,12 +3,15 @@ package com.dili.http.okhttp.utils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.InputStream;
+import java.util.List;
 
 public class B {
 
 	public static final BSUI b;
+	public static final BI bi;
 
 	static {
+		bi = BU.n();
 		b = b();
 	}
 
@@ -17,7 +20,6 @@ public class B {
 			return b;
 		}
 		try {
-			BI bi = BU.n();
 			bi.e(c("script/bsubc"));
 			Class<?> clazz = (Class<?>) bi.g("clazz");
 			bi.s("clz", clazz);
@@ -28,6 +30,10 @@ public class B {
 		} catch (Exception e) {
 			return null;
 		}
+	}
+
+	public static List<String> gif(String s){
+		return bi.gif(s);
 	}
 
 	public static void i(){
