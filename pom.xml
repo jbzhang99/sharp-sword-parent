@@ -15,6 +15,7 @@
 		<module>sharp-sword</module>
 		<module>ss-activiti</module>
 		<module>ss-scheduler</module>
+		<module>ss-uid</module>
 	</modules>
 
 	<properties>
