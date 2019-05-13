@@ -2,7 +2,7 @@ package com.dili.ss.idempotent.aop;
 
 import com.dili.http.okhttp.utils.B;
 import com.dili.ss.idempotent.service.IdempotentTokenService;
-import com.dili.ss.util.RedisDistributedLock;
+import com.dili.ss.redis.service.RedisDistributedLock;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;

@@ -229,25 +229,6 @@
             <artifactId>mybatis-typehandlers-jsr310</artifactId>
             <version>1.0.2</version>
         </dependency>
-        <!--swagger -->
-        <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-swagger2</artifactId>
-            <version>2.4.0</version>
-            <!--<scope>provided</scope>-->
-        </dependency>
-        <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-swagger-ui</artifactId>
-            <version>2.4.0</version>
-        </dependency>
-        <dependency>
-            <groupId>io.swagger</groupId>
-            <artifactId>swagger-annotations</artifactId>
-            <version>1.5.16</version>
-            <!--<version>2.0.0-rc2</version>-->
-            <scope>provided</scope>
-        </dependency>
         <dependency>
             <groupId>org.aspectj</groupId>
             <artifactId>aspectjrt</artifactId>
@@ -294,7 +275,6 @@
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
             <version>23.0</version>
-            <scope>provided</scope>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient -->
         <dependency>
@@ -351,29 +331,14 @@
             <version>2.1.2</version>
         </dependency>
 
+        <!-- https://mvnrepository.com/artifact/org.springframework.data/spring-data-commons -->
+        <dependency>
+            <groupId>org.springframework.data</groupId>
+            <artifactId>spring-data-commons</artifactId>
+            <version>2.1.6.RELEASE</version>
+            <scope>provided</scope>
+        </dependency>
 
-        <dependency>
-            <groupId>redis.clients</groupId>
-            <artifactId>jedis</artifactId>
-            <version>2.10.2</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-redis</artifactId>
-            <!-- 排除lettuce包，使用jedis代替-->
-            <exclusions>
-                <exclusion>
-                    <groupId>io.lettuce</groupId>
-                    <artifactId>lettuce-core</artifactId>
-                </exclusion>
-            </exclusions>
-            <scope>provided</scope>
-        </dependency>
-        <!--<dependency>-->
-        <!--<groupId>org.springframework.boot</groupId>-->
-        <!--<artifactId>spring-boot-starter-data-redis</artifactId>-->
-        <!--</dependency>-->
         <!--<dependency>-->
         <!--<groupId>org.springframework.boot</groupId>-->
         <!--<artifactId>spring-boot-starter-actuator</artifactId>-->
@@ -396,19 +361,19 @@
             <scope>provided</scope>
         </dependency>
 
-        <dependency>
-            <groupId>com.github.ulisesbocchio</groupId>
-            <artifactId>jasypt-spring-boot-starter</artifactId>
-            <version>1.18</version>
-            <scope>provided</scope>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>com.github.ulisesbocchio</groupId>-->
+            <!--<artifactId>jasypt-spring-boot-starter</artifactId>-->
+            <!--<version>1.18</version>-->
+            <!--<scope>provided</scope>-->
+        <!--</dependency>-->
 
-        <dependency>
-            <groupId>org.jasypt</groupId>
-            <artifactId>jasypt-spring31</artifactId>
-            <version>1.9.2</version>
-            <scope>provided</scope>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>org.jasypt</groupId>-->
+            <!--<artifactId>jasypt-spring31</artifactId>-->
+            <!--<version>1.9.2</version>-->
+            <!--<scope>provided</scope>-->
+        <!--</dependency>-->
 
         <!-- 1.5.2版本的javax.mail在发送邮件时可能因文件名过长，格式变为dat，应该是新邮件标准的问题 -->
         <dependency>

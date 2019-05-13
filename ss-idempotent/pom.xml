@@ -122,7 +122,11 @@
 			<artifactId>ss-core</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
-
+        <dependency>
+            <groupId>com.dili</groupId>
+            <artifactId>ss-redis</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.aspectj</groupId>
             <artifactId>aspectjrt</artifactId>

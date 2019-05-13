@@ -226,6 +226,7 @@ public class BeanConver {
 
     /**
      * 将org.springframework.data.domain.Page对象转换为我们自已的BasePage对象
+     * 依赖spring-data-commons包
      * @param page
      * @param <T>
      * @return

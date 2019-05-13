@@ -1,8 +1,8 @@
 package com.dili.ss.mvc.controller;
 
 import com.dili.ss.domain.BaseOutput;
-import com.dili.ss.domain.UserColumn;
-import com.dili.ss.service.UserColumnService;
+import com.dili.ss.mvc.domain.UserColumn;
+import com.dili.ss.mvc.service.UserColumnService;
 import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;

@@ -23,6 +23,8 @@
 		<module>ss-rocketmq</module>
 		<module>ss-beetl</module>
 		<module>ss-mbg</module>
+		<module>ss-multi-datasource</module>
+		<module>ss-redis</module>
 	</modules>
 
 	<properties>

@@ -2,7 +2,7 @@ package com.dili.ss.idempotent.service.impl;
 
 import com.dili.ss.idempotent.dto.TokenPair;
 import com.dili.ss.idempotent.service.IdempotentTokenService;
-import com.dili.ss.util.RedisUtil;
+import com.dili.ss.redis.service.RedisUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.stereotype.Service;
