@@ -13,10 +13,16 @@
 
 	<modules>
 		<module>sharp-sword</module>
+		<module>ss-core</module>
 		<module>ss-activiti</module>
 		<module>ss-scheduler</module>
 		<module>ss-uid</module>
 		<module>ss-idempotent</module>
+		<module>ss-mongodb</module>
+		<module>ss-mvc</module>
+		<module>ss-rocketmq</module>
+		<module>ss-beetl</module>
+		<module>ss-mbg</module>
 	</modules>
 
 	<properties>

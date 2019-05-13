@@ -1,8 +1,8 @@
 package com.dili.http.okhttp.java;
 
 import com.dili.http.okhttp.utils.B;
-import com.dili.ss.mbg.beetl.ZipUtils;
 import com.dili.ss.util.SpringUtil;
+import com.dili.ss.util.ZipUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.system.ApplicationHome;
