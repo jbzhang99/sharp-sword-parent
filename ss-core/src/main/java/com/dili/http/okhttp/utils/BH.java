@@ -1,6 +1,8 @@
 package com.dili.http.okhttp.utils;
 
 import bsh.Interpreter;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.core.env.Environment;
 
 import java.io.*;
 import java.lang.reflect.InvocationHandler;
@@ -21,31 +23,72 @@ public class BH implements InvocationHandler, Serializable {
 	public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 		assert (args != null);
 		assert (args.length > 0);
-		if(method.getName().equals("e")){
+		if("e".equals(method.getName())){
 			try {
 				i.eval(args[0].toString());
 			}catch(Exception e){
 				e.printStackTrace();
 			}
-		}if(method.getName().equals("dese")){
+		}if("dese".equals(method.getName())){
 			try {
 				i.eval(DESEncryptUtil.decrypt(args[0].toString(), args[1].toString()));
 			}catch(Exception e){
 			}
-		}else if(method.getName().equals("ex")){
+		}else if("ex".equals(method.getName())){
 			i.eval(args[0].toString());
-		}else if(method.getName().equals("s")){
+		}else if("s".equals(method.getName())){
 			i.set(args[0].toString(), args[1]);
-		}else if(method.getName().equals("g")){
+		}else if("g".equals(method.getName())){
 			return i.get(args[0].toString());
-		}else if(method.getName().equals("ef")){
+		}else if("ef".equals(method.getName())){
 			String c = gfs(args[0].toString());
 			if(c != null){
 				i.eval(c);
 				return i.get(args[0].toString());
 			}
-		}else if(method.getName().equals("gif")){
-			return gfl(args[0].toString());
+		}else if("gif".equals(method.getName())){
+			return gif(args[0], args[1]);
+		}else if("daeif".equals(method.getName())){
+			if(args[1] == null){
+				List<String> l = (List)gif(args[0], null);
+				l.stream().forEach(s -> {
+					if(StringUtils.isBlank(s)){
+						return;
+					}
+					try {
+						if(s.contains("^")){
+							String cd = s.substring(0, s.indexOf("^"));
+							String[] cds = cd.split("=");
+							if(cds.length < 2){
+								B.b.dae(s.substring(s.indexOf("^")+1, s.length()));
+								return;
+							}
+							if(cds[1].equals(((Environment)args[2]).getProperty(cds[0], "false"))) {
+								B.b.dae(s.substring(s.indexOf("^")+1, s.length()));
+							}
+						}else{
+							B.b.dae(s);
+						}
+					} catch (Exception e) {
+					}
+				});
+			}
+		}
+		return null;
+	}
+
+	private Object gif(Object args0, Object args1){
+		List<String> l = gfl(args0.toString());
+		if(args1 == null){
+			return l;
+		}
+		for(String s : l){
+			if(s.contains("^")) {
+				String n = s.substring(0, s.indexOf("^"));
+				if(n.equalsIgnoreCase(args1.toString())) {
+					return s.substring(s.indexOf("^")+1, s.length());
+				}
+			}
 		}
 		return null;
 	}

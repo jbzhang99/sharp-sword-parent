@@ -316,6 +316,9 @@ public class ExportUtils {
                 if(columnMap.get("hidden")!=null && columnMap.get("hidden").equals(true)){
                 	continue;
                 }
+                if(columnMap.get("title") == null){
+                    continue;
+                }
                 String headerTitle = columnMap.get("title").toString().replaceAll("\\n", "").trim();
                 //最后一行的列头，适应宽度
                 if( i == exportParam.getColumns().size() - 1){

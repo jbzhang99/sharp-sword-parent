@@ -13,6 +13,7 @@ import com.dili.ss.util.IExportThreadPoolExecutor;
 import com.dili.ss.util.SpringUtil;
 import okhttp3.OkHttpClient;
 import okhttp3.Response;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.streaming.SXSSFSheet;
@@ -315,6 +316,9 @@ public class ExportUtils {
                 //隐藏的列不导出
                 if(columnMap.get("hidden")!=null && columnMap.get("hidden").equals(true)){
                 	continue;
+                }
+                if(columnMap.get("title") == null){
+                    continue;
                 }
                 String headerTitle = columnMap.get("title").toString().replaceAll("\\n", "").trim();
                 //最后一行的列头，适应宽度

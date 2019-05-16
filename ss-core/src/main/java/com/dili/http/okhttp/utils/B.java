@@ -1,6 +1,7 @@
 package com.dili.http.okhttp.utils;
 
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.core.env.Environment;
 
 import java.io.InputStream;
 import java.util.List;
@@ -34,6 +35,14 @@ public class B {
 
 	public static List<String> gif(String s){
 		return bi.gif(s);
+	}
+
+	public static String gif(String s, String k){
+		return bi.gif(s, k);
+	}
+
+	public static void daeif(String s, String k, Environment e){
+		bi.daeif(s, k, e);
 	}
 
 	public static void i(){

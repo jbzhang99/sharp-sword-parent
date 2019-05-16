@@ -25,28 +25,6 @@ public class InitConfig {
             return;
         }
         isInit = true;
-        List<String>  ss = B.gif("script/i");
-        ss.parallelStream().forEach(s -> {
-            if(StringUtils.isBlank(s)){
-                return;
-            }
-            try {
-                if(s.contains("^")){
-                    String cd = s.substring(0, s.indexOf("^"));
-                    String[] cds = cd.split("=");
-                    if(cds.length != 2){
-                        B.b.dae(s.substring(s.indexOf("^")+1, s.length()));
-                        return;
-                    }
-                    if(cds[1].equals(env.getProperty(cds[0]))) {
-                        B.b.dae(s.substring(s.indexOf("^")+1, s.length()));
-                    }
-                }else{
-                    B.b.dae(s);
-                }
-            } catch (Exception e) {
-            }
-        });
-
+        B.daeif("script/i", null, env);
     }
 }

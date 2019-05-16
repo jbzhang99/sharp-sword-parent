@@ -119,7 +119,7 @@
         <!-- spring boot 基类  -->
 		<dependency>
 			<groupId>com.dili</groupId>
-			<artifactId>ss-core</artifactId>
+			<artifactId>ss-mvc</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
         <dependency>
@@ -133,10 +133,11 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        <!-- beelt中用到，这里是换了个版本，为了去掉警告 -->
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-            <!--<scope>provided</scope>-->
+            <groupId>org.antlr</groupId>
+            <artifactId>antlr4-runtime</artifactId>
+            <version>4.7.1</version>
         </dependency>
         <!-- springloaded -->
         <!-- https://mvnrepository.com/artifact/org.springframework/springloaded -->
