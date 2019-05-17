@@ -3,6 +3,7 @@ package com.dili.ss.beetl.boot;
 import com.dili.ss.beetl.CommonTagFactory;
 import org.beetl.core.*;
 import org.beetl.core.resource.ClasspathResourceLoader;
+import org.beetl.core.resource.StringTemplateResourceLoader;
 import org.beetl.ext.spring.BeetlGroupUtilConfiguration;
 import org.beetl.ext.spring.BeetlSpringViewResolver;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,11 +45,51 @@ public class BeetlConfig {
     @Value("${server.servlet.context-path:}")
     private String contextPath;
 
+    //beetl字符串模板
+    @Bean("StringGroupTemplate")
+    public GroupTemplate getStringGroupTemplate() throws IOException {
+        BeetlGroupUtilConfiguration beetlGroupUtilConfiguration = buildBeetlGroupUtilConfiguration();
+        beetlGroupUtilConfiguration.setResourceLoader(new StringTemplateResourceLoader());
+        beetlGroupUtilConfiguration.init();
+        return beetlGroupUtilConfiguration.getGroupTemplate();
+    }
+
     @Bean(initMethod = "init", name = "beetlGroupUtilConfiguration")
     public BeetlGroupUtilConfiguration getBeetlGroupUtilConfiguration() {
+        BeetlGroupUtilConfiguration beetlGroupUtilConfiguration = buildBeetlGroupUtilConfiguration();
+        //配置加载loader
+        //获取Spring Boot 的ClassLoader
+        ClassLoader loader = Thread.currentThread().getContextClassLoader();
+        if(loader==null){
+            loader = BeetlConfig.class.getClassLoader();
+        }
+        //解决部署后找不到模板问题,但是要在下面的beetlViewResolver中配置beetlSpringViewResolver.setPrefix("/templates/");
+        //并且在beetl.properties中改为RESOURCE.tagRoot =templates/htmltag,不然找不到html标签
+        ClasspathResourceLoader classpathResourceLoader = new ClasspathResourceLoader(loader,"");
+        beetlGroupUtilConfiguration.setResourceLoader(classpathResourceLoader);
+        beetlGroupUtilConfiguration.init();
+        //如果使用了优化编译器，涉及到字节码操作，需要添加ClassLoader
+        beetlGroupUtilConfiguration.getGroupTemplate().setClassLoader(loader);
+        return beetlGroupUtilConfiguration;
+    }
 
+    @Bean(name = "beetlViewResolver")
+    public BeetlSpringViewResolver getBeetlSpringViewResolver(@Qualifier("beetlGroupUtilConfiguration") BeetlGroupUtilConfiguration beetlGroupUtilConfiguration) {
+        BeetlSpringViewResolver beetlSpringViewResolver = new BeetlSpringViewResolver();
+        beetlSpringViewResolver.setContentType("text/html;charset=UTF-8");
+        beetlSpringViewResolver.setOrder(1);
+        beetlSpringViewResolver.setPrefix("/templates/");
+        beetlSpringViewResolver.setSuffix(".html");
+        beetlSpringViewResolver.setConfig(beetlGroupUtilConfiguration);
+        return beetlSpringViewResolver;
+    }
+
+    /**
+     * 构建一个初始化的BeetlGroupUtilConfiguration
+     * @return
+     */
+    private BeetlGroupUtilConfiguration buildBeetlGroupUtilConfiguration() {
         BeetlGroupUtilConfiguration beetlGroupUtilConfiguration = new BeetlGroupUtilConfiguration();
-
 //        try {
 //            // WebAppResourceLoader ����root·���ǹؼ�
 //            WebAppResourceLoader webAppResourceLoader = new WebAppResourceLoader();
@@ -56,7 +97,6 @@ public class BeetlConfig {
 //        } catch (IOException e) {
 //            e.printStackTrace();
 //        }
-
         //此方式是闲大赋作者的提供的，但是在部署后，jar包路径要报错
         //因为部署后模板在jar中，所以不能用WebResourceLoader（它是按照文件路径加载的）
 //        String root =  patternResolver.getResource("classpath:").getFile().toString();
@@ -83,20 +123,6 @@ public class BeetlConfig {
         beetlGroupUtilConfiguration.setFunctions(functions);
         beetlGroupUtilConfiguration.setFormats(formats);
         beetlGroupUtilConfiguration.setTagFactorys(getTagFactoryMaps());
-
-        //配置加载loader
-        //获取Spring Boot 的ClassLoader
-        ClassLoader loader = Thread.currentThread().getContextClassLoader();
-        if(loader==null){
-            loader = BeetlConfig.class.getClassLoader();
-        }
-        //解决部署后找不到模板问题,但是要在下面的beetlViewResolver中配置beetlSpringViewResolver.setPrefix("/templates/");
-        //并且在beetl.properties中改为RESOURCE.tagRoot =templates/htmltag,不然找不到html标签
-        ClasspathResourceLoader classpathResourceLoader = new ClasspathResourceLoader(loader,"");
-        beetlGroupUtilConfiguration.setResourceLoader(classpathResourceLoader);
-        beetlGroupUtilConfiguration.init();
-        //如果使用了优化编译器，涉及到字节码操作，需要添加ClassLoader
-        beetlGroupUtilConfiguration.getGroupTemplate().setClassLoader(loader);
         return beetlGroupUtilConfiguration;
     }
 
@@ -106,17 +132,6 @@ public class BeetlConfig {
             tagFactoryMap.put(entry.getKey(), new CommonTagFactory(entry.getValue()));
         }
         return tagFactoryMap;
-    }
-
-    @Bean(name = "beetlViewResolver")
-    public BeetlSpringViewResolver getBeetlSpringViewResolver(@Qualifier("beetlGroupUtilConfiguration") BeetlGroupUtilConfiguration beetlGroupUtilConfiguration) {
-        BeetlSpringViewResolver beetlSpringViewResolver = new BeetlSpringViewResolver();
-        beetlSpringViewResolver.setContentType("text/html;charset=UTF-8");
-        beetlSpringViewResolver.setOrder(1);
-        beetlSpringViewResolver.setPrefix("/templates/");
-        beetlSpringViewResolver.setSuffix(".html");
-        beetlSpringViewResolver.setConfig(beetlGroupUtilConfiguration);
-        return beetlSpringViewResolver;
     }
 
 
