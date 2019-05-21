@@ -42,8 +42,6 @@ public class DynamicRoutingDataSourceRegister implements ImportBeanDefinitionReg
 
 	private static final Logger logger = LoggerFactory.getLogger(DynamicRoutingDataSourceRegister.class);
 
-	private ConversionService conversionService = new DefaultConversionService();
-
 	// 如配置文件中未指定数据源类型，使用该默认值
 //	org.apache.tomcat.jdbc.pool.DataSource
 	private static final Object DATASOURCE_TYPE_DEFAULT = "com.alibaba.druid.pool.DruidDataSource";
