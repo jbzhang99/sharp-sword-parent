@@ -20,7 +20,7 @@ import java.lang.reflect.Modifier;
  */
 public class MasterSlaveDataSourceAdvice implements MethodInterceptor {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(DataSourceSwitchAdvice.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(MasterSlaveDataSourceAdvice.class);
 
 	@Override
 	public Object invoke(MethodInvocation invocation) throws Throwable {
