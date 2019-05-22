@@ -10,13 +10,11 @@ import org.jasypt.util.text.BasicTextEncryptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.MutablePropertyValues;
-import org.springframework.beans.PropertyValues;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.GenericBeanDefinition;
 import org.springframework.boot.context.properties.bind.Bindable;
 import org.springframework.boot.context.properties.bind.Binder;
-import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.context.annotation.ImportBeanDefinitionRegistrar;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
@@ -30,9 +28,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-//import org.springframework.boot.autoconfigure.jdbc.DataSourceBuilder;
-//import org.springframework.boot.bind.RelaxedDataBinder;
-//import org.springframework.boot.bind.RelaxedPropertyResolver;
+//import org.springframework.aop.autoconfigure.jdbc.DataSourceBuilder;
+//import org.springframework.aop.bind.RelaxedDataBinder;
+//import org.springframework.aop.bind.RelaxedPropertyResolver;
 
 /**
  * 动态数据源注册<br/>

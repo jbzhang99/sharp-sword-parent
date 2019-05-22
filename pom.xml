@@ -25,6 +25,7 @@
 		<module>ss-mbg</module>
 		<module>ss-multi-datasource</module>
 		<module>ss-redis</module>
+		<module>ss-oplog</module>
 	</modules>
 
 	<properties>
