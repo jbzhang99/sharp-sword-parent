@@ -57,8 +57,8 @@
             
 
             <!--<plugin>-->
-                <!--<groupId>org.springframework.aop</groupId>-->
-                <!--<artifactId>spring-aop-maven-plugin</artifactId>-->
+                <!--<groupId>org.springframework.boot</groupId>-->
+                <!--<artifactId>spring-boot-maven-plugin</artifactId>-->
                 <!--<executions>-->
                     <!--<execution>-->
                         <!--<goals>-->
@@ -116,7 +116,7 @@
 
     <dependencies>
 
-        <!-- spring aop 基类  -->
+        <!-- spring boot 基类  -->
 		<dependency>
 			<groupId>com.dili</groupId>
 			<artifactId>ss-core</artifactId>

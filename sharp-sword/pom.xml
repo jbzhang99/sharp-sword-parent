@@ -49,8 +49,8 @@
             <!--</plugin>-->
 
             <!--<plugin>-->
-            <!--<groupId>org.springframework.aop</groupId>-->
-            <!--<artifactId>spring-aop-maven-plugin</artifactId>-->
+            <!--<groupId>org.springframework.boot</groupId>-->
+            <!--<artifactId>spring-boot-maven-plugin</artifactId>-->
             <!--<executions>-->
             <!--<execution>-->
             <!--<goals>-->
@@ -136,7 +136,7 @@
             <!--<option>-keep class com.dili.ss.constant.** { *;}</option>-->
             <!--<option>-keep class com.dili.ss.base.** { *;}</option>-->
             <!--<option>-keep class com.dili.ss.beetl.** { *;}</option>-->
-            <!--<option>-keep class com.dili.ss.aop.** { *;}</option>-->
+            <!--<option>-keep class com.dili.ss.boot.** { *;}</option>-->
             <!--<option>-keep class com.dili.ss.mbg.** { *;}</option>-->
             <!--<option>-keep class com.dili.ss.quartz.** { *;}</option>-->
             <!--&lt;!&ndash;<option>-keep class com.dili.ssring.** { *;} </option>&ndash;&gt;-->
@@ -438,11 +438,11 @@
             <artifactId>bsh</artifactId>
             <version>2.0b4</version>
         </dependency>
-        <!--  ============================== spring aop starter ==============================  -->
+        <!--  ============================== spring boot starter ==============================  -->
         <!-- 在运行时为项目临时迁移属性, 迁移完成之后，请确保从项目的依赖关系中移除该模块 -->
         <!--<dependency>-->
-            <!--<groupId>org.springframework.aop</groupId>-->
-            <!--<artifactId>spring-aop-properties-migrator</artifactId>-->
+            <!--<groupId>org.springframework.boot</groupId>-->
+            <!--<artifactId>spring-boot-properties-migrator</artifactId>-->
         <!--</dependency>-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -451,8 +451,8 @@
         </dependency>
         <!--mybatis-->
         <!--<dependency>-->
-            <!--<groupId>org.mybatis.spring.aop</groupId>-->
-            <!--<artifactId>mybatis-spring-aop-starter</artifactId>-->
+            <!--<groupId>org.mybatis.spring.boot</groupId>-->
+            <!--<artifactId>mybatis-spring-boot-starter</artifactId>-->
             <!--<version>1.3.2</version>-->
         <!--</dependency>-->
         <!--pagehelper-->
@@ -462,8 +462,8 @@
             <version>1.2.10</version>
             <!--<exclusions>-->
                 <!--<exclusion>-->
-                    <!--<groupId>org.mybatis.spring.aop</groupId>-->
-                    <!--<artifactId>mybatis-spring-aop-starter</artifactId>-->
+                    <!--<groupId>org.mybatis.spring.boot</groupId>-->
+                    <!--<artifactId>mybatis-spring-boot-starter</artifactId>-->
                 <!--</exclusion>-->
             <!--</exclusions>-->
             <!--<scope>provided</scope>-->
@@ -498,8 +498,8 @@
             <scope>provided</scope>
         </dependency>
         <!--<dependency>-->
-        <!--<groupId>org.springframework.aop</groupId>-->
-        <!--<artifactId>spring-aop-starter-actuator</artifactId>-->
+        <!--<groupId>org.springframework.boot</groupId>-->
+        <!--<artifactId>spring-boot-starter-actuator</artifactId>-->
         <!--<scope>provided</scope>-->
         <!--</dependency>-->
         <dependency>
@@ -514,8 +514,8 @@
             <!--<optional>true</optional>-->
         </dependency>
         <!--<dependency>-->
-        <!--<groupId>org.springframework.aop</groupId>-->
-        <!--<artifactId>spring-aop-starter-tomcat</artifactId>-->
+        <!--<groupId>org.springframework.boot</groupId>-->
+        <!--<artifactId>spring-boot-starter-tomcat</artifactId>-->
         <!--</dependency>-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
