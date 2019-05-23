@@ -63,15 +63,16 @@ public class UpdateLogContentProvider implements LogContentProvider {
         Map<String, UpdatedLogInfo> updatedFields = new HashMap<>();
         List<String> excludes = Lists.newArrayList("id", "page", "sort", "rows", "order", "metadata"
                 , "setForceParams", "insertForceParams", "selectColumns", "whereSuffixSql", "checkInjection");
+        Object id = null;
         //如果是DTO接口，则取getter上的FieldDef注解的label
         if(clazz.isInterface()) {
-            buildUpdatedFieldsByDto(updatedFields, clazz, param1, service, excludes);
+            id = buildUpdatedFieldsByDto(updatedFields, clazz, param1, service, excludes);
         }
         //否则是普通JAVABean，取字段上的FieldDef注解的label
         else{
-            buildUpdatedFieldsByBean(updatedFields, clazz, param1, service, excludes);
+            id = buildUpdatedFieldsByBean(updatedFields, clazz, param1, service, excludes);
         }
-        StringBuilder stringBuilder = new StringBuilder();
+        StringBuilder stringBuilder = new StringBuilder("[目标id]:"+id);
         for(String key : updatedFields.keySet()){
             UpdatedLogInfo updatedLogInfo = updatedFields.get(key);
             Object oldValue = updatedLogInfo.getOldValue();
@@ -87,7 +88,7 @@ public class UpdateLogContentProvider implements LogContentProvider {
         return stringBuilder.toString();
     }
 
-    private void buildUpdatedFieldsByDto(Map<String, UpdatedLogInfo> updatedFields, Class<?> clazz, Object param1, BaseService<? extends IDTO, Long> service, List<String> excludes){
+    private Object buildUpdatedFieldsByDto(Map<String, UpdatedLogInfo> updatedFields, Class<?> clazz, Object param1, BaseService<? extends IDTO, Long> service, List<String> excludes){
         DTO dto = DTOUtils.go(param1);
         Object idObj = dto.get("id");
         IDTO oldObj = null;
@@ -124,9 +125,10 @@ public class UpdateLogContentProvider implements LogContentProvider {
                 }
             }
         }
+        return idObj;
     }
 
-    private void buildUpdatedFieldsByBean(Map<String, UpdatedLogInfo> updatedFields, Class<?> clazz, Object param1, BaseService<? extends IDTO, Long> service, List<String> excludes){
+    private Object buildUpdatedFieldsByBean(Map<String, UpdatedLogInfo> updatedFields, Class<?> clazz, Object param1, BaseService<? extends IDTO, Long> service, List<String> excludes){
         Map<String, Object> objMap = null;
         try {
             objMap = BeanConver.transformObjectToMap(param1);
@@ -160,6 +162,7 @@ public class UpdateLogContentProvider implements LogContentProvider {
                 if(null != value){
                     UpdatedLogInfo updatedLogInfo = new UpdatedLogInfo();
                     updatedLogInfo.setNewValue(value);
+                    updatedLogInfo.setLabel(label);
                     if(oldObjMap != null){
                         //新旧值相同，则不记录
                         if(value.equals(oldObjMap.get(field))){
@@ -172,5 +175,6 @@ public class UpdateLogContentProvider implements LogContentProvider {
             } catch (IllegalAccessException e) {
             }
         }
+        return objMap.get("id");
     }
 }
