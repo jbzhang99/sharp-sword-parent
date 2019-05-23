@@ -24,6 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
@@ -42,6 +43,7 @@ import java.util.concurrent.ExecutorService;
 @Component
 @Aspect
 @Order(1)
+@ConditionalOnExpression("'${oplog.enable}'=='true'")
 public class LogAspect {
 
     @Resource(name="StringGroupTemplate")
@@ -65,7 +67,7 @@ public class LogAspect {
     Map<String, LogInitializer> logInitializerCache = new HashMap<>();
     @PostConstruct
     public void init() throws IllegalAccessException, InstantiationException {
-        System.out.println("日志切面启动");
+        System.out.println("操作日志启动");
         executor = ((Class<IExportThreadPoolExecutor>)B.b.g("threadPoolExecutor")).newInstance().getCustomThreadPoolExecutor();
     }
 

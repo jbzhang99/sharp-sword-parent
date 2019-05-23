@@ -72,17 +72,21 @@ public class UpdateLogContentProvider implements LogContentProvider {
         else{
             id = buildUpdatedFieldsByBean(updatedFields, clazz, param1, service, excludes);
         }
-        StringBuilder stringBuilder = new StringBuilder("[目标id]:"+id);
-        for(String key : updatedFields.keySet()){
-            UpdatedLogInfo updatedLogInfo = updatedFields.get(key);
-            Object oldValue = updatedLogInfo.getOldValue();
-            if(oldValue == null){
-                stringBuilder.append("[" + updatedLogInfo.getLabel() + "]:修改为'" + updatedLogInfo.getNewValue() + "'\r\n");
-            }else{
-                if(oldValue instanceof Date){
-                    oldValue = DateUtils.format((Date)oldValue);
+        StringBuilder stringBuilder = new StringBuilder("[目标id]:"+id+"\r\n");
+        if(updatedFields.isEmpty()){
+            stringBuilder.append("无字段修改");
+        }else {
+            for (String key : updatedFields.keySet()) {
+                UpdatedLogInfo updatedLogInfo = updatedFields.get(key);
+                Object oldValue = updatedLogInfo.getOldValue();
+                if (oldValue == null) {
+                    stringBuilder.append("[" + updatedLogInfo.getLabel() + "]:修改为'" + updatedLogInfo.getNewValue() + "'\r\n");
+                } else {
+                    if (oldValue instanceof Date) {
+                        oldValue = DateUtils.format((Date) oldValue);
+                    }
+                    stringBuilder.append("[" + updatedLogInfo.getLabel() + "]:从'" + oldValue + "'修改为'" + updatedLogInfo.getNewValue() + "'\r\n");
                 }
-                stringBuilder.append("[" + updatedLogInfo.getLabel() + "]:从'" + oldValue + "'修改为'" + updatedLogInfo.getNewValue() + "'\r\n");
             }
         }
         return stringBuilder.toString();
