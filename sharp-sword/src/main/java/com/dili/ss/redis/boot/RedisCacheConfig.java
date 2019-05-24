@@ -48,12 +48,15 @@ public class RedisCacheConfig extends CachingConfigurerSupport {
     private String hostName;
     @Value("${spring.redis.port}")
     private Integer port;
+    @Value("${spring.redis.database:0}")
+    private Integer database;
     @Bean
     public JedisConnectionFactory redisConnectionFactory() {
         JedisConnectionFactory redisConnectionFactory = new JedisConnectionFactory();
         // Defaults
         redisConnectionFactory.setHostName(hostName);
         redisConnectionFactory.setPort(port);
+        redisConnectionFactory.setDatabase(database);
         return redisConnectionFactory;
     }
 

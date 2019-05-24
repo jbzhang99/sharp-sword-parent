@@ -17,6 +17,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
@@ -45,8 +46,10 @@ public class TaskUtils {
 	 * @param scheduleJob 调度方式
 	 * @param scheduleMessage 调度消息
 	 */
-	public static void invokeMethod(ScheduleJob scheduleJob, ScheduleMessage scheduleMessage) {
-		if(null == scheduleJob || null == scheduleMessage) return;
+	public static boolean invokeMethod(ScheduleJob scheduleJob, ScheduleMessage scheduleMessage) throws IllegalAccessException, InstantiationException, ClassNotFoundException {
+		if(null == scheduleJob || null == scheduleMessage){
+			return true;
+		}
 		String timesKey = scheduleJob.getJobGroup()+scheduleJob.getJobName();
 		if(!QuartzConstants.sheduelTimes.containsKey(timesKey)){
 			QuartzConstants.sheduelTimes.put(timesKey,0);
@@ -56,36 +59,30 @@ public class TaskUtils {
 		scheduleMessage.setJobGroup(scheduleJob.getJobGroup());
 		scheduleMessage.setJobName(scheduleJob.getJobName());
 		Object object = null;
-
 		if (StringUtils.isNotBlank(scheduleJob.getSpringId())) {
 			object = SpringUtil.getBean(scheduleJob.getSpringId());
-			invokeLocalMethod(scheduleJob, scheduleMessage, object);
+			return invokeLocalMethod(scheduleJob, scheduleMessage, object);
 		} else if (StringUtils.isNotBlank(scheduleJob.getBeanClass())) {
-			try {
-				Class clazz = Class.forName(scheduleJob.getBeanClass());
-				object = clazz.newInstance();
-				invokeLocalMethod(scheduleJob, scheduleMessage, object);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+			Class clazz = Class.forName(scheduleJob.getBeanClass());
+			object = clazz.newInstance();
+			return invokeLocalMethod(scheduleJob, scheduleMessage, object);
 		}else if(StringUtils.isNotBlank(scheduleJob.getUrl())){
 			if(scheduleJob.getIsConcurrent()!= null && scheduleJob.getIsConcurrent()==1){
-				asyncExecute(scheduleJob.getUrl(), JSONObject.toJSONString(scheduleMessage), "POST");
+				return asyncExecute(scheduleJob.getUrl(), JSONObject.toJSONString(scheduleMessage), "POST");
 			}else{
-				syncExecute(scheduleJob.getUrl(), JSONObject.toJSONString(scheduleMessage), "POST");
+				return syncExecute(scheduleJob.getUrl(), JSONObject.toJSONString(scheduleMessage), "POST");
 			}
-
 		}else{
 			log.info("无可调度的对象!");
-			return;
+			return true;
 		}
-		log.info("任务名称 = [" + scheduleJob.getJobName() + "]----------启动成功");
+//		log.info("任务名称 = [" + scheduleJob.getJobName() + "]----------启动成功");
 	}
 
-	private static void invokeLocalMethod(ScheduleJob scheduleJob, ScheduleMessage scheduleMessage, Object object){
+	private static boolean invokeLocalMethod(ScheduleJob scheduleJob, ScheduleMessage scheduleMessage, Object object){
 		if (object == null) {
 			log.error("任务名称 = [" + scheduleJob.getJobName() + "]---------------未启动成功，请检查是否配置正确！！！");
-			return;
+			return false;
 		}
 		Method method = null;
 		Object targetObj = null;
@@ -95,10 +92,15 @@ public class TaskUtils {
 			if (method != null && targetObj != null) {
 				method.invoke(targetObj, scheduleMessage);
 			}
+			return true;
 		} catch (Exception e) {
-			log.error("任务名称 = [" + scheduleJob.getJobName() + "]---------------未启动成功，调度参数设置错误！异常:"+e.getMessage());
+			String message = e.getMessage();
+			if(e instanceof InvocationTargetException){
+				message = ((InvocationTargetException) e).getTargetException().getMessage();
+			}
+			log.error("任务名称 = [" + scheduleJob.getJobName() + "]---------------未启动成功，调度参数设置错误！异常:" + message);
+			return false;
 		}
-
 	}
 
 	/**
@@ -107,12 +109,11 @@ public class TaskUtils {
 	 * @param paramObj
 	 * @param httpMethod
 	 */
-	private static void syncExecute(String url, Object paramObj, String httpMethod){
+	private static boolean syncExecute(String url, Object paramObj, String httpMethod){
 		Response resp = null;
 		try{
-			Map<String, String> headersMap = new HashMap<>();
+			Map<String, String> headersMap = new HashMap<>(1);
 			headersMap.put("Content-Type", "application/json;charset=utf-8");
-
 			if("POST".equalsIgnoreCase(httpMethod)){
 
 				String json = paramObj instanceof String ? (String)paramObj : JSON.toJSONString(paramObj);
@@ -131,11 +132,14 @@ public class TaskUtils {
 			}
 			if(resp.isSuccessful()){
 				log.info(String.format("远程调用["+url+"]成功,code:[%s], message:[%s]", resp.code(),resp.message()));
+				return true;
 			}else{
 				log.error(String.format("远程调用["+url+"]发生失败,code:[%s], message:[%s]", resp.code(),resp.message()));
+				return false;
 			}
 		} catch (Exception e) {
 			log.error(String.format("远程调用["+url+"]发生异常, message:[%s]", e.getMessage()));
+			return false;
 		}
 	}
 
@@ -145,13 +149,11 @@ public class TaskUtils {
 	 * @param paramObj
 	 * @param httpMethod
 	 */
-	private static void asyncExecute(String url, Object paramObj, String httpMethod){
+	private static boolean asyncExecute(String url, Object paramObj, String httpMethod){
 		try{
-			Map<String, String> headersMap = new HashMap<>();
+			Map<String, String> headersMap = new HashMap<>(1);
 			headersMap.put("Content-Type", "application/json;charset=utf-8");
-
 			if("POST".equalsIgnoreCase(httpMethod)){
-
 				String json = paramObj instanceof String ? (String)paramObj : JSON.toJSONString(paramObj);
 				OkHttpUtils
 						.postString()
@@ -192,9 +194,11 @@ public class TaskUtils {
 							}
 						});
 			}
-			log.info("远程调用["+url+"]成功");
+			log.info("异步远程调用["+url+"]完成");
+			return true;
 		} catch (Exception e) {
-			log.error(String.format("远程调用["+url+"]发生异常,message:[%s]", e.getMessage()));
+			log.error(String.format("异步远程调用["+url+"]发生异常,message:[%s]", e.getMessage()));
+			return false;
 		}
 	}
 }

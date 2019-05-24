@@ -15,10 +15,13 @@ CREATE TABLE `schedule_job` (
 	`url` VARCHAR(100) NULL DEFAULT NULL COMMENT 'url##支持远程调用restful url',
 	`is_concurrent` INT(11) NULL DEFAULT NULL COMMENT '任务是否有状态##1：并发; 0:同步##{provider:"isConcurrentProvider", data:[{value:0, text:"同步"},{value:1, text:"并发"}]}',
 	`method_name` VARCHAR(40) NULL DEFAULT NULL COMMENT '任务调用的方法名##bean_class和spring_id需要配置方法名',
+	`retry_count` INT(11) NULL DEFAULT NULL COMMENT '重试次数',
+	`retry_interval` BIGINT(20) NULL DEFAULT NULL COMMENT '重试间隔/毫秒',
+	`recovery_callback` VARCHAR(40) NULL DEFAULT NULL COMMENT '兜底回调',
 	PRIMARY KEY (`id`)
 )
 COMMENT='任务调度'
 COLLATE='utf8_general_ci'
 ENGINE=InnoDB
-AUTO_INCREMENT=8
+AUTO_INCREMENT=9
 ;

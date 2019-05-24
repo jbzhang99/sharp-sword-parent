@@ -212,7 +212,7 @@ public class LogAspect {
      * @param objName
      * @return
      */
-    private <T> T getObj(String objName, Class<T> clazz) throws ClassNotFoundException, IllegalAccessException, InstantiationException, BeansException {
+    private <T> T getObj(String objName, Class<T> clazz) throws ClassNotFoundException, IllegalAccessException, InstantiationException, BeansException, ParamErrorException {
         if(objName.contains(".")){
             Class objClass = Class.forName(objName);
             if(clazz.isAssignableFrom(objClass)){
@@ -220,13 +220,8 @@ public class LogAspect {
             }
             throw new ParamErrorException(objName + "不是" + clazz.getName() +"的实例");
         }else{
-            T bean = null;
-            try {
-                //这里可能bean不存在，会抛异常
-                bean = SpringUtil.getBean(objName, clazz);
-            } catch (BeansException e) {
-                throw e;
-            }
+            //这里可能bean不存在，会抛异常
+            T bean = SpringUtil.getBean(objName, clazz);
             if(clazz.isAssignableFrom(bean.getClass())){
                 return bean;
             }
