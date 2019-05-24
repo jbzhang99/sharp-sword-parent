@@ -2,17 +2,16 @@ package com.dili.ss.quartz;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.parser.Feature;
 import com.dili.http.okhttp.OkHttpUtils;
 import com.dili.http.okhttp.callback.Callback;
-import com.dili.ss.util.AopTargetUtils;
-import com.dili.ss.util.SpringUtil;
+import com.dili.ss.domain.BaseOutput;
 import com.dili.ss.quartz.domain.QuartzConstants;
 import com.dili.ss.quartz.domain.ScheduleJob;
 import com.dili.ss.quartz.domain.ScheduleMessage;
-import okhttp3.Call;
-import okhttp3.MediaType;
-import okhttp3.OkHttpClient;
-import okhttp3.Response;
+import com.dili.ss.util.AopTargetUtils;
+import com.dili.ss.util.SpringUtil;
+import okhttp3.*;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -96,7 +95,10 @@ public class TaskUtils {
 			targetObj = AopTargetUtils.getTarget(object);
 			method = targetObj.getClass().getDeclaredMethod(scheduleJob.getMethodName(), ScheduleMessage.class);
 			if (method != null && targetObj != null) {
-				method.invoke(targetObj, scheduleMessage);
+				Object result = method.invoke(targetObj, scheduleMessage);
+				if(Boolean.FALSE.equals(result)){
+					return false;
+				}
 			}
 			return true;
 		} catch (Exception e) {
@@ -137,6 +139,16 @@ public class TaskUtils {
 						.execute();
 			}
 			if(resp.isSuccessful()){
+				ResponseBody responseBody = resp.body();
+				String result = responseBody == null ? null : resp.body().string();
+				if(StringUtils.isNotBlank(result)){
+					if("false".equalsIgnoreCase(result)){
+						return false;
+					}
+					if(!StringUtils.equalsIgnoreCase("200", JSONObject.parseObject(result, BaseOutput.class, Feature.IgnoreNotMatch).getCode())){
+						return false;
+					}
+				}
 				log.info(String.format("远程调用["+url+"]成功,code:[%s], message:[%s]", resp.code(),resp.message()));
 				return true;
 			}else{
