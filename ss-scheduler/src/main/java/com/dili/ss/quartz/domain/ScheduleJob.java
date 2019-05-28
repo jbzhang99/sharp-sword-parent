@@ -148,14 +148,14 @@ public interface ScheduleJob extends IBaseDomain, IMybatisForceParams {
 
     void setMethodName(String methodName);
 
-    @FieldDef(label="重试次数", maxLength = 2, defValue = "3")
+    @FieldDef(label="重试次数", maxLength = 2)
     @Column(name = "`retry_count`")
     @EditMode(editor = FieldEditor.Number, required = false)
     Integer getRetryCount();
     void setRetryCount(Integer retryCount);
 
     @Column(name = "`retry_interval`")
-    @FieldDef(label="重试间隔/毫秒", maxLength = 2, defValue = "3000")
+    @FieldDef(label="重试间隔/毫秒", maxLength = 2)
     @EditMode(editor = FieldEditor.Number, required = false)
     Long getRetryInterval();
     void setRetryInterval(Long retryInterval);

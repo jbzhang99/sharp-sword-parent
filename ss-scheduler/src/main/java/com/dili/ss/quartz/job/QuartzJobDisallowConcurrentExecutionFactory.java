@@ -42,6 +42,14 @@ public class QuartzJobDisallowConcurrentExecutionFactory implements Job {
      * @param scheduleMessage
      */
     private void invoke(ScheduleJob scheduleJob, ScheduleMessage scheduleMessage) {
+        //默认不重试
+        if(scheduleJob.getRetryCount() == null || scheduleJob.getRetryCount() < 0){
+            scheduleJob.setRetryCount(0);
+        }
+        //默认重试间隔1秒
+        if(scheduleJob.getRetryInterval() == null){
+            scheduleJob.setRetryInterval(1000L);
+        }
         // RetryerBuilder 构建重试实例 retryer,可以设置重试源且可以支持多个重试源，可以配置重试次数或重试超时时间，以及可以配置等待时间间隔
         Retryer<Boolean> retryer = RetryerBuilder.<Boolean> newBuilder()
                 //设置异常重试源
