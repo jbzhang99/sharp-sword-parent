@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -16,8 +17,8 @@ import java.sql.SQLException;
  * 针对druid监控的数据源配置
  * Created by asiam on 2017/2/24 0024.
  */
-@Configuration
-@ConditionalOnExpression("'${druid-filter.enable}'=='true'")
+//@Configuration
+//@ConditionalOnExpression("'${druid-filter.enable}'=='true'")
 public class DruidConfig {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DruidConfig.class);
@@ -98,5 +99,13 @@ public class DruidConfig {
         }
         return datasource;
     }
+
+//    @Bean("dataSource")
+//    @Primary
+//    @ConfigurationProperties(prefix = "spring.datasource")
+//    public DruidDataSource druidDataSource() {
+//        DruidDataSource druidDataSource = new DruidDataSource();
+//        return druidDataSource;
+//    }
 
 }

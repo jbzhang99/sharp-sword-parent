@@ -14,11 +14,12 @@ import org.springframework.context.annotation.Configuration;
 /**
  * druid监控,访问地址:http://localhost/druid/index.html
  * 登录名:admin,密码:123456
+ * 类实现参考DruidStatViewServletConfiguration
  * Created by asiamastor on 2017/1/20.
  */
-@Configuration
-@ConditionalOnExpression("'${druid-filter.enable}'=='true'")
-@ConfigurationProperties(prefix="druid-filter", ignoreInvalidFields = true)
+//@Configuration
+//@ConditionalOnExpression("'${druid-filter.enable}'=='true'")
+//@ConfigurationProperties(prefix="druid-filter", ignoreInvalidFields = true)
 //@PropertySource({"classpath:application.properties"})
 public class DruidWebStatFilterConfig {
 
@@ -60,6 +61,7 @@ public class DruidWebStatFilterConfig {
 //        //IP黑名单 (存在共同时，deny优先于allow) : 如果满足deny的话提示:Sorry, you are not permitted to view this page.
             servletRegistrationBean.addInitParameter("deny", deny);
         }
+//        参考com.alibaba.druid.support.http.ResourceServlet
 //        //登录查看信息的账号密码.
         servletRegistrationBean.addInitParameter("loginUsername",loginUsername);
         servletRegistrationBean.addInitParameter("loginPassword",loginPassword);

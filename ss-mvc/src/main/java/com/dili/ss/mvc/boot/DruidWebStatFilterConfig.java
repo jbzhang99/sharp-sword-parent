@@ -16,9 +16,9 @@ import org.springframework.context.annotation.Configuration;
  * 登录名:admin,密码:123456
  * Created by asiamastor on 2017/1/20.
  */
-@Configuration
-@ConditionalOnExpression("'${druid-filter.enable}'=='true'")
-@ConfigurationProperties(prefix="druid-filter", ignoreInvalidFields = true)
+//@Configuration
+//@ConditionalOnExpression("'${druid-filter.enable}'=='true'")
+//@ConfigurationProperties(prefix="druid-filter", ignoreInvalidFields = true)
 //@PropertySource({"classpath:application.properties"})
 public class DruidWebStatFilterConfig {
 
