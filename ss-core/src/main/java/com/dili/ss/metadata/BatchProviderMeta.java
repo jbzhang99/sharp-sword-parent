@@ -3,6 +3,7 @@ package com.dili.ss.metadata;
 import com.dili.ss.dto.IDTO;
 
 import java.util.Map;
+import java.util.function.Function;
 
 /**
  * 批量提供者的元数据信息
@@ -54,4 +55,12 @@ public interface BatchProviderMeta extends IDTO {
      */
     String getFkField();
     void setFkField(String fkField);
+
+    /**
+     * 值不匹配处理器
+     * 如果找不到对应的值，使用该处理器
+     * @return
+     */
+    Function getMismatchHandler();
+    void setMismatchHandler(Function mismatchHandler);
 }

@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 /**
  * 批量提供者支持
@@ -112,5 +113,10 @@ public abstract class BatchDisplayTextProviderSupport extends BatchDisplayTextPr
             return batchProviderMeta.getRelationTablePkField();
         }
         return "id";
+    }
+
+    @Override
+    protected Function getMismatchHandler(Map metaMap) {
+        return getBatchProviderMeta(metaMap).getMismatchHandler();
     }
 }

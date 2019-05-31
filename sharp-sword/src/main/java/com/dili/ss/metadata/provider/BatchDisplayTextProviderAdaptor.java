@@ -2,6 +2,7 @@ package com.dili.ss.metadata.provider;
 
 import com.dili.ss.dto.IDTO;
 import com.dili.ss.metadata.*;
+import com.dili.ss.metadata.handler.DefaultMismatchHandler;
 import com.dili.ss.service.CommonService;
 import com.dili.ss.util.BeanConver;
 import com.dili.ss.util.POJOUtils;
@@ -15,6 +16,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 /**
  * 批量提供者适配器
@@ -22,18 +24,20 @@ import java.util.Map;
 @Component
 public abstract class BatchDisplayTextProviderAdaptor implements BatchValueProvider {
     protected static final Logger log = LoggerFactory.getLogger(BatchDisplayTextProviderAdaptor.class);
-//    转义字段json，如果为string，则key为filed属性
+    //    转义字段json，如果为string，则key为filed属性
     protected static final String ESCAPE_FILEDS_KEY = "_escapeFileds";
-//    关联(数据库)表的主键名
+    //    关联(数据库)表的主键名
     protected static final String RELATION_TABLE_PK_FIELD_KEY = "_relationTablePkField";
-//    关联(数据库)表名
+    //    关联(数据库)表名
     protected static final String RELATION_TABLE_KEY = "_relationTable";
-//    主DTO与关联DTO的关联(java bean)属性，即外键
+    //    主DTO与关联DTO的关联(java bean)属性，即外键
     protected static final String FK_FILED_KEY = "_fkField";
-//    查询参数json
+    //    查询参数json
     protected static final String QUERY_PARAMS_KEY = "queryParams";
     @Autowired
     protected CommonService commonService;
+    @Autowired
+    protected DefaultMismatchHandler defaultMismatchHandler;
 
     //不提供下拉数据
     @Override
@@ -141,7 +145,7 @@ public abstract class BatchDisplayTextProviderAdaptor implements BatchValueProvi
 
     /**
      * 设置转义值，支持dto,map和javaBean
-     * @param list
+     * @param list 原始列表
      * @param id2RelTable key为id，value为关联DTO
      */
     private void setDtoData(List list, Map<String, Map> id2RelTable, Map metaMap){
@@ -162,11 +166,14 @@ public abstract class BatchDisplayTextProviderAdaptor implements BatchValueProvi
                 for (Map.Entry<String, String> entry : getEscapeFileds(metaMap).entrySet()) {
                     //有可能外键有值，但是关联表没数据，即是左关联为空的场景
                     if(id2RelTable.get(key) == null){
-                        continue;
+                        //记录原始值
+                        dto.aset(ValueProviderUtils.ORIGINAL_KEY_PREFIX + entry.getKey(), keyObj);
+                        dto.aset(entry.getKey(), getMismatchHandler(metaMap).apply(keyObj));
+                    }else {
+                        //记录原始值
+                        dto.aset(ValueProviderUtils.ORIGINAL_KEY_PREFIX + entry.getKey(), keyObj);
+                        dto.aset(entry.getKey(), id2RelTable.get(key).get(entry.getValue()));
                     }
-                    //记录原始值
-                    dto.aset(ValueProviderUtils.ORIGINAL_KEY_PREFIX+entry.getKey(), keyObj);
-                    dto.aset(entry.getKey(), id2RelTable.get(key).get(entry.getValue()));
                 }
             }
         }else if(list.get(0) instanceof Map) {
@@ -186,11 +193,14 @@ public abstract class BatchDisplayTextProviderAdaptor implements BatchValueProvi
                 for (Map.Entry<String, String> entry : getEscapeFileds(metaMap).entrySet()) {
                     //有可能外键有值，但是关联表没数据，即是左关联为空的场景
                     if(id2RelTable.get(key) == null){
-                        continue;
+                        //记录原始值
+                        map.put(ValueProviderUtils.ORIGINAL_KEY_PREFIX + entry.getKey(), keyObj);
+                        map.put(entry.getKey(), getMismatchHandler(metaMap).apply(keyObj));
+                    }else {
+                        //记录原始值
+                        map.put(ValueProviderUtils.ORIGINAL_KEY_PREFIX + entry.getKey(), keyObj);
+                        map.put(entry.getKey(), id2RelTable.get(key).get(entry.getValue()));
                     }
-                    //记录原始值
-                    map.put(ValueProviderUtils.ORIGINAL_KEY_PREFIX+entry.getKey(), keyObj);
-                    map.put(entry.getKey(), id2RelTable.get(key).get(entry.getValue()));
                 }
             }
         }else{//java bean
@@ -210,10 +220,11 @@ public abstract class BatchDisplayTextProviderAdaptor implements BatchValueProvi
                 for (Map.Entry<String, String> entry : getEscapeFileds(metaMap).entrySet()) {
                     //有可能外键有值，但是关联表没数据，即是左关联为空的场景
                     if(id2RelTable.get(key) == null){
-                        continue;
+                        POJOUtils.setProperty(obj, entry.getKey(), getMismatchHandler(metaMap).apply(keyObj));
+                    }else {
+                        //java bean无法记录原始值，而且设置转义值也可能因为类型转换报错
+                        POJOUtils.setProperty(obj, entry.getKey(), id2RelTable.get(key).get(entry.getValue()));
                     }
-                    //java bean无法记录原始值，而且设置转义值也可能因为类型转换报错
-                    POJOUtils.setProperty(obj, entry.getKey(), id2RelTable.get(key).get(entry.getValue()));
                 }
             }
         }
@@ -275,5 +286,14 @@ public abstract class BatchDisplayTextProviderAdaptor implements BatchValueProvi
      */
     protected String getRelationTablePkField(Map metaMap) {
         return "id";
+    }
+
+    /**
+     * 值不匹配处理器
+     * 如果找不到对应的值，使用该处理器
+     * @return
+     */
+    protected Function getMismatchHandler(Map metaMap){
+        return defaultMismatchHandler;
     }
 }
