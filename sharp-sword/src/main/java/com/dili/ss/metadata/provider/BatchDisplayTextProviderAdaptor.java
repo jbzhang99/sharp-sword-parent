@@ -240,7 +240,7 @@ public abstract class BatchDisplayTextProviderAdaptor implements BatchValueProvi
 
     /**
      * 返回主DTO和关联DTO需要转义的字段名，可同时转义多个字段
-     * Map中key为主DTO在页面(datagrid)渲染时需要的(field)字段名， value为关联DTO中对应的显示值的字段名
+     * 返回的Map中key为主DTO在页面(datagrid)渲染时需要的(field)字段名， value为关联DTO中对应的显示值的字段名
      * @return
      */
     //    {
@@ -269,7 +269,7 @@ public abstract class BatchDisplayTextProviderAdaptor implements BatchValueProvi
 
     /**
      * 主DTO与关联DTO的关联(java bean)属性(外键)
-     * 先从field属性取，没取到再取_fkField属性
+     * 先从_fkField属性取，没取到再取field属性
      * 子类可自行实现
      * @return
      */
@@ -290,7 +290,7 @@ public abstract class BatchDisplayTextProviderAdaptor implements BatchValueProvi
 
     /**
      * 值不匹配处理器
-     * 如果找不到对应的值，使用该处理器
+     * 如果找不到对应的值，使用defaultMismatchHandler处理器
      * @return
      */
     protected Function getMismatchHandler(Map metaMap){

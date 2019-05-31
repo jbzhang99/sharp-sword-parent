@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 客户提供者
+ * 简单批量提供者实现,根据datagrid表头参数动态提供数据。
  */
 @Component
 public class SimpleBatchDisplayTextProvider extends BatchSqlDisplayTextProviderAdaptor {

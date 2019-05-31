@@ -1,24 +1,13 @@
 package com.dili.ss.metadata.provider;
 
 import com.alibaba.fastjson.JSONObject;
-import com.dili.ss.dto.IDTO;
-import com.dili.ss.metadata.BatchValueProvider;
-import com.dili.ss.metadata.FieldMeta;
-import com.dili.ss.metadata.ObjectMeta;
-import com.dili.ss.metadata.ValuePair;
-import com.dili.ss.service.CommonService;
-import com.dili.ss.util.POJOUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.util.CollectionUtils;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
- * 客户提供者
+ * 简单批量提供者实现,根据datagrid表头参数动态提供数据。
  */
 @Component
 public class SimpleBatchDisplayTextProvider extends BatchSqlDisplayTextProviderAdaptor {
