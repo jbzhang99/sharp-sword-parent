@@ -26,6 +26,7 @@
 		<module>ss-multi-datasource</module>
 		<module>ss-redis</module>
 		<module>ss-oplog</module>
+		<module>ss-seata</module>
 	</modules>
 
 	<properties>
