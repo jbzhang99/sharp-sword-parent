@@ -34,7 +34,7 @@ public class SeataAspect {
 
     private static final Logger log = LoggerFactory.getLogger(SeataAspect.class);
     @PostConstruct
-    public void init() throws IllegalAccessException, InstantiationException {
+    public void init() {
         System.out.println("SeataAspect.init");
     }
 
