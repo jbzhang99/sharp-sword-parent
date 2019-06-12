@@ -13,6 +13,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+/**
+ * 拦截每次http请求，判断header中是否有XID
+ * 有则调用RootContext.bind(restXid)绑定全局事务
+ */
 public class SeataXidFilter extends OncePerRequestFilter {
     protected Logger logger = LoggerFactory.getLogger(SeataXidFilter.class);
 
