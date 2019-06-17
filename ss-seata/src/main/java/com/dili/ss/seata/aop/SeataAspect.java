@@ -1,18 +1,14 @@
 package com.dili.ss.seata.aop;
 
-import com.alibaba.fescar.core.context.RootContext;
 import com.dili.ss.retrofitful.annotation.ReqHeader;
 import com.dili.ss.seata.consts.SeataConsts;
+import io.seata.core.context.RootContext;
 import org.apache.commons.lang3.StringUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
-import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
-import org.springframework.core.annotation.Order;
-import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.lang.annotation.Annotation;
@@ -24,10 +20,10 @@ import java.util.concurrent.ExecutorService;
 /**
  * Seata切面
  */
-@Component
-@Aspect
-@Order(100)
-@ConditionalOnExpression("'${seata.enable}'=='true'")
+//@Component
+//@Aspect
+//@Order(100)
+//@ConditionalOnExpression("'${seata.enable}'=='true'")
 public class SeataAspect {
 
     private ExecutorService executor;

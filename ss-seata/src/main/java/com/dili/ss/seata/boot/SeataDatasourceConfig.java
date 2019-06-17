@@ -1,7 +1,7 @@
 package com.dili.ss.seata.boot;
 
 import com.alibaba.druid.pool.DruidDataSource;
-import com.alibaba.fescar.rm.datasource.DataSourceProxy;
+import io.seata.rm.datasource.DataSourceProxy;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;

@@ -1,12 +1,12 @@
 package com.dili.ss.seata.retrofitful;
 
-import com.alibaba.fescar.core.context.RootContext;
 import com.dili.ss.retrofitful.annotation.ReqHeader;
 import com.dili.ss.retrofitful.aop.annotation.Order;
 import com.dili.ss.retrofitful.aop.filter.AbstractFilter;
 import com.dili.ss.retrofitful.aop.invocation.Invocation;
 import com.dili.ss.seata.annotation.GlobalTx;
 import com.dili.ss.seata.consts.SeataConsts;
+import io.seata.core.context.RootContext;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 

@@ -1,7 +1,7 @@
 package com.dili.ss.seata.boot;
 
-import com.alibaba.fescar.core.context.RootContext;
 import com.dili.ss.seata.consts.SeataConsts;
+import io.seata.core.context.RootContext;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

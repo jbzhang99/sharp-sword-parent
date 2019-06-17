@@ -11,8 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
 
 import java.lang.reflect.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * 反射工具类.
@@ -338,6 +337,177 @@ public class ReflectionUtils {
         for (Class<?> intfClass : intfClasses.getInterfaces()) {
             getAccessibleMethodsRecursive(methods, intfClass);
         }
+    }
+
+    // ----------------- 另一个反射工具 ----------------------
+
+    /**
+     * The constant MAX_NEST_DEPTH.
+     */
+    public static final int MAX_NEST_DEPTH = 20;
+
+    /**
+     * Gets class by name.
+     *
+     * @param className the class name
+     * @return the class by name
+     * @throws ClassNotFoundException the class not found exception
+     */
+    public static Class<?> getClassByName(String className) throws ClassNotFoundException {
+        return Class.forName(className, true, Thread.currentThread().getContextClassLoader());
+    }
+
+    /**
+     * get Field Value
+     *
+     * @param target    the target
+     * @param fieldName the field name
+     * @return field value
+     * @throws NoSuchFieldException the no such field exception
+     * @throws SecurityException the security exception
+     * @throws IllegalArgumentException the illegal argument exception
+     * @throws IllegalAccessException the illegal access exception
+     */
+//    public static Object getFieldValue(Object target, String fieldName)
+//            throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
+//        Class<?> cl = target.getClass();
+//        int i = 0;
+//        while ((i++) < MAX_NEST_DEPTH && cl != null) {
+//            try {
+//                Field field = cl.getDeclaredField(fieldName);
+//                field.setAccessible(true);
+//                return field.get(target);
+//            } catch (Exception e) {
+//                cl = cl.getSuperclass();
+//            }
+//        }
+//        throw new NoSuchFieldException("class:" + target.getClass() + ", field:" + fieldName);
+//    }
+
+    /**
+     * invoke Method
+     *
+     * @param target     the target
+     * @param methodName the method name
+     * @return object
+     * @throws NoSuchMethodException the no such method exception
+     * @throws SecurityException the security exception
+     * @throws IllegalAccessException the illegal access exception
+     * @throws IllegalArgumentException the illegal argument exception
+     * @throws InvocationTargetException the invocation target exception
+     */
+    public static Object invokeMethod(Object target, String methodName)
+            throws NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException,
+            InvocationTargetException {
+        Class<?> cl = target.getClass();
+        int i = 0;
+        while ((i++) < MAX_NEST_DEPTH && cl != null) {
+            try {
+                Method m = cl.getDeclaredMethod(methodName);
+                m.setAccessible(true);
+                return m.invoke(target);
+            } catch (Exception e) {
+                cl = cl.getSuperclass();
+            }
+        }
+        throw new NoSuchMethodException("class:" + target.getClass() + ", methodName:" + methodName);
+    }
+
+    /**
+     * invoke Method
+     *
+     * @param target         the target
+     * @param methodName     the method name
+     * @param parameterTypes the parameter types
+     * @param args           the args
+     * @return object
+     * @throws NoSuchMethodException the no such method exception
+     * @throws SecurityException the security exception
+     * @throws IllegalAccessException the illegal access exception
+     * @throws IllegalArgumentException the illegal argument exception
+     * @throws InvocationTargetException the invocation target exception
+     */
+//    public static Object invokeMethod(Object target, String methodName, Class<?>[] parameterTypes, Object[] args)
+//            throws NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException,
+//            InvocationTargetException {
+//        Class<?> cl = target.getClass();
+//        int i = 0;
+//        while ((i++) < MAX_NEST_DEPTH && cl != null) {
+//            try {
+//                Method m = cl.getDeclaredMethod(methodName, parameterTypes);
+//                m.setAccessible(true);
+//                return m.invoke(target, args);
+//            } catch (Exception e) {
+//                cl = cl.getSuperclass();
+//            }
+//        }
+//        throw new NoSuchMethodException("class:" + target.getClass() + ", methodName:" + methodName);
+//    }
+
+    /**
+     * invoke static Method
+     *
+     * @param targetClass     the target class
+     * @param methodName      the method name
+     * @param parameterTypes  the parameter types
+     * @param parameterValues the parameter values
+     * @return object
+     * @throws NoSuchMethodException the no such method exception
+     * @throws SecurityException the security exception
+     * @throws IllegalAccessException the illegal access exception
+     * @throws IllegalArgumentException the illegal argument exception
+     * @throws InvocationTargetException the invocation target exception
+     */
+    public static Object invokeStaticMethod(Class<?> targetClass, String methodName, Class<?>[] parameterTypes,
+                                            Object[] parameterValues)
+            throws NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException,
+            InvocationTargetException {
+        int i = 0;
+        while ((i++) < MAX_NEST_DEPTH && targetClass != null) {
+            try {
+                Method m = targetClass.getMethod(methodName, parameterTypes);
+                return m.invoke(null, parameterValues);
+            } catch (Exception e) {
+                targetClass = targetClass.getSuperclass();
+            }
+        }
+        throw new NoSuchMethodException("class:" + targetClass + ", methodName:" + methodName);
+    }
+
+    /**
+     * get Method by name
+     *
+     * @param classType      the class type
+     * @param methodName     the method name
+     * @param parameterTypes the parameter types
+     * @return method
+     * @throws NoSuchMethodException the no such method exception
+     * @throws SecurityException the security exception
+     */
+    public static Method getMethod(Class<?> classType, String methodName, Class<?>[] parameterTypes)
+            throws NoSuchMethodException, SecurityException {
+        return classType.getMethod(methodName, parameterTypes);
+    }
+
+    /**
+     * get all interface of the clazz
+     *
+     * @param clazz the clazz
+     * @return set
+     */
+    public static Set<Class<?>> getInterfaces(Class<?> clazz) {
+        if (clazz.isInterface()) {
+            return Collections.singleton(clazz);
+        }
+        Set<Class<?>> interfaces = new LinkedHashSet<Class<?>>();
+        while (clazz != null) {
+            Class<?>[] ifcs = clazz.getInterfaces();
+            for (Class<?> ifc : ifcs) {
+                interfaces.addAll(getInterfaces(ifc));
+            }
+            clazz = clazz.getSuperclass();
+        }
+        return interfaces;
     }
 }
 

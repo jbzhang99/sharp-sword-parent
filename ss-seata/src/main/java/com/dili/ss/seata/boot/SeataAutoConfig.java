@@ -1,6 +1,6 @@
 package com.dili.ss.seata.boot;
 
-import com.alibaba.fescar.spring.annotation.GlobalTransactionScanner;
+import io.seata.spring.annotation.GlobalTransactionScanner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
