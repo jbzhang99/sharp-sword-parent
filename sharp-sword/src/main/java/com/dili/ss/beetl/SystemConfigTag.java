@@ -1,6 +1,6 @@
 package com.dili.ss.beetl;
 
-import com.dili.ss.util.SystemConfigUtils;
+import com.dili.ss.util.SpringUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.beetl.core.BodyContent;
 import org.beetl.core.Tag;
@@ -30,7 +30,7 @@ public class SystemConfigTag extends Tag {
 			//has属性优化，找到has的属性名则渲染标签体
 			if(StringUtils.isNotBlank(has)){
 				BodyContent content = getBodyContent(); // 标签体内容，暂存
-				if(StringUtils.isNotBlank(SystemConfigUtils.getProperty(has))){
+				if(StringUtils.isNotBlank(SpringUtil.getProperty(has))){
 					ctx.byteWriter.writeString(content.getBody());
 				}
 			}else{//没找到has属性名则直接取name属性的值
@@ -39,7 +39,7 @@ public class SystemConfigTag extends Tag {
 					return;
 				}
 				String defaultValue = (String) argsMap.get(DEFAULT_VALUE_FIELD);
-				String value = defaultValue == null ? SystemConfigUtils.getProperty(name) : SystemConfigUtils.getProperty(name, defaultValue);
+				String value = defaultValue == null ? SpringUtil.getProperty(name) : SpringUtil.getProperty(name, defaultValue);
 				ctx.byteWriter.writeString(value);
 			}
 		} catch (Exception e) {

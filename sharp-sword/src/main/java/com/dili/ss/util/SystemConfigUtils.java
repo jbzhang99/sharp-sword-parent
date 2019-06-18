@@ -12,8 +12,10 @@ import java.util.Properties;
 
 /**
  * 获取spring boot系统配置
+ * 建议使用com.dili.ss.util.SpringUtil
  * Created by asiamaster on 2017/6/29 0029.
  */
+@Deprecated
 public class SystemConfigUtils {
 	private static final Logger LOGGER = LoggerFactory.getLogger(SystemConfigUtils.class);
 	private static Properties props ;

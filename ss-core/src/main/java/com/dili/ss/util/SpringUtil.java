@@ -7,17 +7,24 @@ package com.dili.ss.util;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.EnvironmentAware;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
 
 @Component
-public class SpringUtil implements ApplicationContextAware {
+public class SpringUtil implements ApplicationContextAware, EnvironmentAware {
 
     private static ApplicationContext applicationContext = null;
+    private static Environment environment;
 
     public static ApplicationContext getApplicationContext() {
         return applicationContext;
+    }
+
+    public static Environment getEnvironment() {
+        return environment;
     }
 
     //获取applicationContext
@@ -79,5 +86,21 @@ public class SpringUtil implements ApplicationContextAware {
     public static <T> T getBean(String name, Class<T> clazz) {
         return getApplicationContext().getBean(name, clazz);
     }
+
+    @Override
+    public void setEnvironment(Environment environment) {
+        if (SpringUtil.environment == null) {
+            SpringUtil.environment = environment;
+        }
+    }
+
+    public static String getProperty(String key){
+        return getEnvironment().getProperty(key);
+    }
+
+    public static String getProperty(String key, String defaultValue){
+        return getEnvironment().getProperty(key, defaultValue);
+    }
+
 
 }
