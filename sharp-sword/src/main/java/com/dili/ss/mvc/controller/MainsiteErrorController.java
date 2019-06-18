@@ -2,7 +2,7 @@ package com.dili.ss.mvc.controller;
 
 import com.alibaba.fastjson.JSONObject;
 import com.dili.ss.domain.BaseOutput;
-import com.dili.ss.util.SystemConfigUtils;
+import com.dili.ss.util.SpringUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,7 +67,7 @@ public class MainsiteErrorController implements ErrorController {
 //		}else{
 //			return "/500"
 //		}
-		return SystemConfigUtils.getProperty("error.page.404", "error/404");
+		return SpringUtil.getProperty("error.page.404", "error/404");
 	}
 
 //	没有权限
@@ -75,7 +75,7 @@ public class MainsiteErrorController implements ErrorController {
 	public String noAccess(HttpServletRequest request, HttpServletResponse response){
 //		if ("XMLHttpRequest".equals(request.getHeader("X-Requested-With"))) {
 //		}else {
-			return SystemConfigUtils.getProperty("error.page.404", "error/404");
+			return SpringUtil.getProperty("error.page.404", "error/404");
 //		}
 	}
 
