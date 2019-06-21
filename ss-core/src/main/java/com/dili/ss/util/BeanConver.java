@@ -6,6 +6,7 @@ import com.dili.ss.domain.BaseQuery;
 import com.dili.ss.dto.DTOUtils;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageInfo;
+import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cglib.beans.BeanCopier;
@@ -176,8 +177,11 @@ public class BeanConver {
      */
     public static <T,K> List<K> copeList(List<T> source, Class<K> target){
         List<K> list = new ArrayList<K>();
+        if(CollectionUtils.isEmpty(source)){
+            return new ArrayList<>();
+        }
+        BeanCopier beanCopier = BeanCopier.create(source.get(0).getClass(),target,false);
         for(T af : source){
-            BeanCopier beanCopier = BeanCopier.create(af.getClass(),target,false);
             K af1 = null;
             try {
                 af1 = (K)target.newInstance();
@@ -267,8 +271,8 @@ public class BeanConver {
         }
         Map<String, Object> returnMap = new HashMap<String, Object>();
         if(recursive){
-            if(type.getSuperclass() != null){
-                returnMap.putAll(transformObjectToMap(bean, type, true));
+            if(type.getSuperclass() != null && !type.getSuperclass().equals(Object.class)){
+                returnMap.putAll(transformObjectToMap(bean, type.getSuperclass(), true));
             }
             if(type.getInterfaces() != null && type.getInterfaces().length > 0){
                 for(Class<?> intf : type.getInterfaces()){
