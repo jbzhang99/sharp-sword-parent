@@ -3,6 +3,7 @@ package com.dili.ss.mbg.beetl;
 import com.dili.ss.util.FileHelper;
 import com.dili.ss.util.ZipUtils;
 import com.google.common.collect.Lists;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.beetl.core.Configuration;
 import org.beetl.core.GroupTemplate;
@@ -120,6 +121,16 @@ public class BeetlTemplatesPlugin extends PluginAdapter {
             }
             return;
         }
+        //不是beetl模板文件就直接复制
+        if(childFile.getCanonicalPath().lastIndexOf(".btl") == -1){
+            File targetFile = new File(targetDir, getFileRelativePath(childFile.getCanonicalPath(), introspectedTable));
+            //如果文件存在，并且不能覆盖就直接return了
+            if(targetFile.exists() && !overwrite){
+                return;
+            }
+            FileUtils.copyFile(childFile, targetFile);
+            return;
+        }
         String className = introspectedTable.getFullyQualifiedTable().getDomainObjectName();
         String classNameFirstLower = StringUtils.uncapitalize(className);
         Template bodyVM = getFileBeetlGroupTemplate().getTemplate(getFileRelativePath(childFile.getCanonicalPath()));
@@ -149,6 +160,11 @@ public class BeetlTemplatesPlugin extends PluginAdapter {
     private String getFileRelativePath(String fileName, IntrospectedTable introspectedTable){
         String className = introspectedTable.getFullyQualifiedTable().getDomainObjectName();
         String classNameFirstLower = StringUtils.uncapitalize(className);
+        if(fileName.lastIndexOf(".btl") == -1){
+            String finalName = fileName.substring(fileName.indexOf(templateRootDir.replaceAll(replaceFromSeparator, replaceToSeparator))+templateRootDir.length());
+            finalName = finalName.replaceAll("\\$\\{classNameFirstLower\\}", classNameFirstLower).replaceAll("\\$\\{className\\}", className);
+            return replaceAllProperties(finalName);
+        }
         String finalName = fileName.substring(fileName.indexOf(templateRootDir.replaceAll(replaceFromSeparator, replaceToSeparator))+templateRootDir.length(), fileName.lastIndexOf(".btl"));
         finalName = finalName.replaceAll("\\$\\{classNameFirstLower\\}", classNameFirstLower).replaceAll("\\$\\{className\\}", className);
         return replaceAllProperties(finalName);
@@ -204,13 +220,16 @@ public class BeetlTemplatesPlugin extends PluginAdapter {
     //递归获取子文件和目录
     private List<File> ergodic(File file,List<File> resultFile){
         File[] files = file.listFiles();
-        if(files==null)return resultFile;// 判断目录下是不是空的
+        if(files==null) {
+            return resultFile;// 判断目录下是不是空的
+        }
         for (File f : files) {
             if(f.isDirectory()){// 判断是否文件夹
                 resultFile.add(f);
                 ergodic(f,resultFile);// 调用自身,查找子目录
-            }else
+            }else {
                 resultFile.add(f);
+            }
         }
         return resultFile;
     }

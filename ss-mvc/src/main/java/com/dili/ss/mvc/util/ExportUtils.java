@@ -197,16 +197,16 @@ public class ExportUtils {
 		        futures.add(future);
 	        }
 	        int current = 0;
-	        for (Future<JSONArray> future : futures) {
-		        try {
-			        JSONArray rowDatas = future.get();
-			        buildSingleData(current++, exportParam.getColumns(), rowDatas, sheet, dataColumnStyle);
-		        } catch (InterruptedException e) {
-			        e.printStackTrace();
-		        } catch (Exception e) {
-			        e.printStackTrace();
-		        }
-	        }
+            try {
+                for (Future<JSONArray> future : futures) {
+                    JSONArray rowDatas = future.get();
+                    buildSingleData(current++, exportParam.getColumns(), rowDatas, sheet, dataColumnStyle);
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
