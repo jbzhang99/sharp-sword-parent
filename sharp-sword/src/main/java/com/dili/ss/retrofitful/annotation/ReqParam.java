@@ -3,7 +3,7 @@ package com.dili.ss.retrofitful.annotation;
 import java.lang.annotation.*;
 
 /**
- * 请求参数
+ * Form请求参数
  * Created by asiamastor on 2016/11/28.
  */
 @Documented
