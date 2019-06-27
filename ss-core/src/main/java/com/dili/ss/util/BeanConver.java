@@ -316,7 +316,7 @@ public class BeanConver {
      * @throws Exception
      */
     public static Map<String, Object> transformObjectToMap(Object bean) throws Exception {
-        return transformObjectToMap(bean, bean.getClass());
+        return DTOUtils.isDTOProxy(bean) ? transformObjectToMap(bean, DTOUtils.getDTOClass(bean)) : transformObjectToMap(bean, bean.getClass());
     }
 
 
