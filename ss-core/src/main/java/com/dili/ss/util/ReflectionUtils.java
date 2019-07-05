@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
 
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.*;
 import java.util.*;
 
@@ -508,6 +509,25 @@ public class ReflectionUtils {
             clazz = clazz.getSuperclass();
         }
         return interfaces;
+    }
+
+    /**
+     * 调用接口默认方法
+     * @param proxy
+     * @param method
+     * @param args
+     * @return
+     * @throws Throwable
+     */
+    public static Object invokeDefaultMethod(Object proxy, Method method, Object[] args) throws Throwable {
+        final Constructor<MethodHandles.Lookup> constructor = MethodHandles.Lookup.class
+                .getDeclaredConstructor(Class.class, int.class);
+        if (!constructor.isAccessible()) {
+            constructor.setAccessible(true);
+        }
+        final Class<?> declaringClass = method.getDeclaringClass();
+        return constructor.newInstance(declaringClass, MethodHandles.Lookup.PRIVATE)
+                .unreflectSpecial(method, declaringClass).bindTo(proxy).invokeWithArguments(args);
     }
 }
 

@@ -8,6 +8,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.dili.ss.metadata.annotation.FieldDef;
 import com.dili.ss.util.POJOUtils;
+import com.dili.ss.util.ReflectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.Reader;
@@ -69,7 +70,7 @@ public class DTOHandler<T extends DTO> implements InvocationHandler, Serializabl
 					delegate.put(field, fieldDef.handler().newInstance().apply(args[0]));
 				}
 
-			// 取值情况
+				// 取值情况
 			} else {
 				//getter方法返回类型
 				Class<?> returnType = method.getReturnType();
@@ -124,8 +125,14 @@ public class DTOHandler<T extends DTO> implements InvocationHandler, Serializabl
 						retval = Enum.valueOf((Class<? extends Enum>) returnType, (String) retval);
 					}
 					delegate.put(field, retval);
-					// 否则需要返回缺省值
-				} else if (returnType.isPrimitive()) {
+
+				}
+				//如果是默认接口，调用默认方法
+				else if(method.isDefault()){
+					return ReflectionUtils.invokeDefaultMethod(proxy, method, null);
+				}
+				// delegate中没有key, 需要返回缺省值
+				else if (returnType.isPrimitive()) {
 					return POJOUtils.getPrimitiveDefault(returnType);
 				}
 			}

@@ -3,7 +3,9 @@ package com.dili.ss.util;
 
 import com.dili.ss.domain.BasePage;
 import com.dili.ss.domain.BaseQuery;
+import com.dili.ss.dto.DTO;
 import com.dili.ss.dto.DTOUtils;
+import com.dili.ss.exception.AppException;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageInfo;
 import org.apache.commons.collections4.CollectionUtils;
@@ -267,7 +269,13 @@ public class BeanConver {
             return (Map) bean;
         }
         if(DTOUtils.isDTOProxy(bean)){
-            return DTOUtils.go(bean);
+            DTO dto = null;
+            try {
+                dto = DTOUtils.goByDef(bean);
+            } catch (Throwable throwable) {
+                throw new AppException(throwable.getMessage());
+            }
+            return dto;
         }
         Map<String, Object> returnMap = new HashMap<String, Object>();
         if(recursive){

@@ -183,7 +183,7 @@ public class RSAUtil {
         System.out.println("===========乙方使用甲方提供的公钥对数据进行解密==============");
         //乙方进行数据的解密
         byte[] decode1 = RSAUtil.decryptByPublicKey(code1, publicKey);
-        System.out.println("乙方解密后的数据：" + new String(decode1) + "/n/n");
+        System.out.println("乙方解密后的数据：" + new String(decode1));
 
         System.out.println("===========反向进行操作，乙方向甲方发送数据==============/n/n");
 

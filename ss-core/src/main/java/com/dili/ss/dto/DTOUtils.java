@@ -8,6 +8,7 @@ import com.dili.ss.metadata.ObjectMeta;
 import com.dili.ss.util.BeanConver;
 import com.dili.ss.util.CloneUtils;
 import com.dili.ss.util.POJOUtils;
+import com.dili.ss.util.ReflectionUtils;
 import org.apache.commons.beanutils.ConvertUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
@@ -68,6 +69,32 @@ public class DTOUtils {
 		else if (isProxy(obj)) {
 			DTOHandler handler = (DTOHandler) Proxy.getInvocationHandler(obj);
 			return handler.getDelegate();
+		}
+		return null;
+	}
+
+	/**
+	 * 获取代理对象
+	 * @param obj
+	 * @return
+	 */
+	public static DTO goByDef(Object obj) throws Throwable {
+		if (obj == null)
+			return null;
+		else if (obj instanceof DTO)
+			return (DTO) obj;
+		else if (isProxy(obj)) {
+			DTOHandler handler = (DTOHandler) Proxy.getInvocationHandler(obj);
+			DTO dto = handler.getDelegate();
+			Class<?> clazz = handler.getProxyClazz();
+			for (Method method : clazz.getMethods()) {
+				if(method.isDefault() && POJOUtils.isGetMethod(method)){
+					Object result = ReflectionUtils.invokeDefaultMethod(obj, method, null);
+					String field = POJOUtils.getBeanField(method);
+					dto.put(field, result);
+				}
+			}
+			return dto;
 		}
 		return null;
 	}
