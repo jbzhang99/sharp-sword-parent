@@ -253,7 +253,7 @@
                             $("#grid").datagrid("reload");
                             $('#dlg').dialog('close');
                         } else {
-                            $.messager.alert('错误', data.result);
+                            $.messager.alert('错误', data.message);
                         }
                     },
                     error: function () {
@@ -284,7 +284,7 @@
                             $("#grid").datagrid("reload");
                             $('#dlg').dialog('close');
                         } else {
-                            $.messager.alert('错误', data.result);
+                            $.messager.alert('错误', data.message);
                         }
                     },
                     error: function () {
@@ -345,7 +345,7 @@
                     $("#grid").datagrid("reload");
                     $('#dlg').dialog('close');
                 } else {
-                    $.messager.alert('错误', data.result);
+                    $.messager.alert('错误', data.message);
                 }
             },
             error: function () {
@@ -375,7 +375,7 @@
                             $("#grid").datagrid("reload");
                             $('#dlg').dialog('close');
                         } else {
-                            $.messager.alert('错误', data.result);
+                            $.messager.alert('错误', data.message);
                         }
                     },
                     error: function () {

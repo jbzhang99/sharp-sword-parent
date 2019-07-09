@@ -36,14 +36,14 @@ public class BaseRestFulApi {
             }else{
                 out.setCode(ResultCode.PARAMS_ERROR);
             }
-            out.setResult(exception.getMessage());
+            out.setMessage(exception.getMessage());
             out.setErrorData(exception.getErrorData());
             LOGGER.error("失败:",e);
             return out;
         } 
         if(e instanceof IllegalArgumentException){
             out.setCode(ResultCode.PARAMS_ERROR);
-            out.setResult(e.getMessage());
+            out.setMessage(e.getMessage());
             LOGGER.error("失败:",e);
             return out;
         } 
@@ -54,7 +54,7 @@ public class BaseRestFulApi {
             }else{
                 out.setCode(ResultCode.NOT_AUTH_ERROR);                
             }
-            out.setResult(exception.getMessage());
+            out.setMessage(exception.getMessage());
             out.setErrorData(exception.getErrorData());
             LOGGER.error("失败:",e);
             return out;
@@ -66,14 +66,14 @@ public class BaseRestFulApi {
             }else{
                 out.setCode(ResultCode.DATA_ERROR);                
             }
-            out.setResult(e.getMessage());
+            out.setMessage(e.getMessage());
             out.setErrorData(exception.getErrorData());
             LOGGER.error("失败:",e);
             return out;
         }
         out.setCode(ResultCode.APP_ERROR);
         //系统内部异常不直接抛到前端
-        out.setResult("系统处理发生异常");
+        out.setMessage("系统处理发生异常");
         LOGGER.error("失败:", e);
         return out;
     }

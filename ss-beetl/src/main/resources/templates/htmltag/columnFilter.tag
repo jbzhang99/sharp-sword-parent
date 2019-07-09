@@ -86,7 +86,7 @@
                             }
                         }
                     }else{
-                        $.messager.alert('错误',output.result);
+                        $.messager.alert('错误',output.message);
                     }
                 },
                 error: function(err){
@@ -201,9 +201,9 @@
             async : true,
             success: function (data) {
                 if(data.code=="200"){
-                    $.messager.alert('提示',data.result);
+                    $.messager.alert('提示',data.message);
                 }else{
-                    $.messager.alert('错误',data.result);
+                    $.messager.alert('错误',data.message);
                 }
             },
             error: function(err){

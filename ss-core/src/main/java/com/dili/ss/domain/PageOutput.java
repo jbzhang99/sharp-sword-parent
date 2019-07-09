@@ -114,13 +114,13 @@ public class PageOutput<T> extends BaseOutput<T> {
     }
 
     @Override
-    public String getResult() {
-        return super.getResult();
+    public String getMessage() {
+        return super.getMessage();
     }
 
     @Override
-    public PageOutput setResult(String result) {
-        super.setResult(result);
+    public PageOutput setMessage(String message) {
+        super.setMessage(message);
         return this;
     }
 }

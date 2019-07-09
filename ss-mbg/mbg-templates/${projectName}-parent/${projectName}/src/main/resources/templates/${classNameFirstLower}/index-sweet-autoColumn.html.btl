@@ -307,7 +307,7 @@
                         $("#grid").datagrid("reload");
                         $('#dlg').dialog('close');
                     }else{
-                        swal('错误',data.result, 'error');
+                        swal('错误',data.message, 'error');
                     }
                 },
                 error: function(){
@@ -336,7 +336,7 @@
                                 $("#grid").datagrid("reload");
                                 $('#dlg').dialog('close');
                             }else{
-                                swal('错误',data.result, 'error');
+                                swal('错误',data.message, 'error');
                             }
                         },
                         error: function(){

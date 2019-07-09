@@ -51,9 +51,9 @@
         dataType: "json",
         success: function(data){
             //判断如果是BaseOutput，就再取data
-            if(data.code != null && data.result != null){
+            if(data.code != null && data.message != null){
                 if(data.code != "200"){
-                    alert(data.result);
+                    alert(data.message);
                     return;
                 }
                 data = data.data;

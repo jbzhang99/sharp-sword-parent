@@ -9,7 +9,7 @@ import com.dili.ss.constant.ResultCode;
 
 /**
  * 基础输出对象
- * 
+ *
  * @author dev-center
  * @since 2014-05-10
  */
@@ -19,18 +19,27 @@ public class BaseOutput<T> {
      * 业务状态码 <br/>
      * 200代表成功，其它表示失败，具体失败原因请查看ResultCode属性
      */
-    private String code;//
+    private String code;
     /**
      * 业务状态说明 <br/>
      * 200时返回OK，code!=200时表示具体失败原因
      */
+    private String message;
+    /**
+     * 业务状态说明 <br/>
+     * 200时返回OK，code!=200时表示具体失败原因
+     */
+    @Deprecated
     private String result;
     /**
      * 返回业务数据 <br/>
      * 根据接口泛型指定
      */
-    private T data;// 数据
-    
+    private T data;
+    /**
+     * 元数据
+     */
+    private Object metadata;
     /**
      * 非业务数据，api调用业务状态码不为200时的错误数据，具体数据是否有值，查看ResultCode,根据状态码确定
      */
@@ -39,9 +48,9 @@ public class BaseOutput<T> {
     public BaseOutput() {
     }
 
-    public BaseOutput(String code, String result) {
+    public BaseOutput(String code, String message) {
         this.code = code;
-        this.result = result;
+        this.message = message;
     }
 
     public String getCode() {
@@ -53,12 +62,36 @@ public class BaseOutput<T> {
         return this;
     }
 
-    public String getResult() {
-        return result;
+    public Object getMetadata() {
+        return metadata;
     }
 
+    public BaseOutput setMetadata(Object metadata) {
+        this.metadata = metadata;
+        return this;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public BaseOutput setMessage(String message) {
+        this.message = message;
+        return this;
+    }
+
+    /**
+     * 语义不明确，建议使用message属性
+     * @return
+     */
+    @Deprecated
+    public String getResult() {
+        return result == null ? getMessage() : result;
+    }
+    @Deprecated
     public BaseOutput setResult(String result) {
         this.result = result;
+        this.message = result;
         return this;
     }
 
@@ -91,11 +124,11 @@ public class BaseOutput<T> {
         return create(ResultCode.APP_ERROR, msg);
     }
 
-    
+
     public String getErrorData() {
         return errorData;
     }
-    
+
     public BaseOutput setErrorData(String errorData) {
         this.errorData = errorData;
         return this;

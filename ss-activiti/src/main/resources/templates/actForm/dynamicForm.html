@@ -42,9 +42,9 @@
                 success: function (data) {
                     $("#submitBtn").linkbutton("enable");
                     if(data.code=="200"){
-                        swal('成功',data.result, 'success');
+                        swal('成功',data.message, 'success');
                     }else{
-                        swal('错误',data.result, 'error');
+                        swal('错误',data.message, 'error');
                     }
                 },
                 error: function(){

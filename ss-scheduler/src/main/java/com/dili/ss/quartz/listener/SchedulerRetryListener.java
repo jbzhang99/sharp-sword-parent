@@ -49,7 +49,7 @@ public class SchedulerRetryListener implements RetryListener {
 //        System.out.print(",hasResult=" + attempt.hasResult());
 //        else {
 //            // 正常返回时的结果
-//            log.info(",result=" + attempt.getResult());
+//            log.info(",result=" + attempt.getMessage());
 //        }
     }
 

@@ -4,6 +4,7 @@ import org.apache.commons.codec.binary.Base64;
 
 import javax.crypto.Cipher;
 import java.security.*;
+import java.security.interfaces.RSAPrivateCrtKey;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.PKCS8EncodedKeySpec;
@@ -159,6 +160,71 @@ public class RSAUtil {
         return key.getEncoded();
     }
 
+    public static String getRSAPrivateKeyAsNetFormat(byte[] encodedPrivkey) {
+        try {
+            StringBuffer buff = new StringBuffer(1024);
+            PKCS8EncodedKeySpec pvkKeySpec = new PKCS8EncodedKeySpec(encodedPrivkey);
+            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+            RSAPrivateCrtKey pvkKey = (RSAPrivateCrtKey) keyFactory.generatePrivate(pvkKeySpec);
+            buff.append("<RSAKeyValue>");
+            buff.append("<Modulus>" + Base64.encodeBase64String(removeMSZero(pvkKey.getModulus().toByteArray())) + "</Modulus>");
+            buff.append("<Exponent>" + Base64.encodeBase64String(removeMSZero(pvkKey.getPublicExponent().toByteArray())) + "</Exponent>");
+            buff.append("<P>" + Base64.encodeBase64String(removeMSZero(pvkKey.getPrimeP().toByteArray())) + "</P>");
+            buff.append("<Q>" + Base64.encodeBase64String(removeMSZero(pvkKey.getPrimeQ().toByteArray())) + "</Q>");
+            buff.append("<DP>" + Base64.encodeBase64String(removeMSZero(pvkKey.getPrimeExponentP().toByteArray())) + "</DP>");
+            buff.append("<DQ>" + Base64.encodeBase64String(removeMSZero(pvkKey.getPrimeExponentQ().toByteArray())) + "</DQ>");
+            buff.append("<InverseQ>" + Base64.encodeBase64String(removeMSZero(pvkKey.getCrtCoefficient().toByteArray())) + "</InverseQ>");
+            buff.append("<D>" + Base64.encodeBase64String(removeMSZero(pvkKey.getPrivateExponent().toByteArray())) + "</D>");
+            buff.append("</RSAKeyValue>");
+            return buff.toString().replaceAll("[ \t\n\r]", "");
+        } catch (Exception e) {
+            System.err.println(e);
+            return null;
+        }
+    }
+
+    public static String getRSAPublicKeyAsNetFormat(byte[] encodedPrivkey) {
+        try {
+            StringBuffer buff = new StringBuffer(1024);
+//            PKCS8EncodedKeySpec pvkKeySpec = new PKCS8EncodedKeySpec(encodedPrivkey);
+            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+            RSAPublicKey pukKey = (RSAPublicKey) keyFactory.generatePublic(new X509EncodedKeySpec(encodedPrivkey));
+            buff.append("<RSAKeyValue>");
+            buff.append("<Modulus>" + Base64.encodeBase64String(removeMSZero(pukKey.getModulus().toByteArray())) + "</Modulus>");
+            buff.append("<Exponent>" + Base64.encodeBase64String(removeMSZero(pukKey.getPublicExponent().toByteArray())) + "</Exponent>");
+            buff.append("</RSAKeyValue>");
+            return buff.toString().replaceAll("[ \t\n\r]", "");
+        } catch (Exception e) {
+            System.err.println(e);
+            return null;
+        }
+    }
+
+    public static String encodePublicKeyToXml(PublicKey key) {
+        if (!RSAPublicKey.class.isInstance(key)) {
+            return null;
+        }
+        RSAPublicKey pubKey = (RSAPublicKey) key;
+        StringBuilder sb = new StringBuilder();
+        sb.append("<RSAKeyValue>");
+        sb.append("<Modulus>").append(Base64.encodeBase64String(pubKey.getModulus().toByteArray())).append("</Modulus>");
+        sb.append("<Exponent>").append(Base64.encodeBase64String(pubKey.getPublicExponent().toByteArray())).append("</Exponent>");
+        sb.append("</RSAKeyValue>");
+        return sb.toString();
+    }
+
+    private static byte[] removeMSZero(byte[] data) {
+        byte[] data1;
+        int len = data.length;
+        if (data[0] == 0) {
+            data1 = new byte[data.length - 1];
+            System.arraycopy(data, 1, data1, 0, len - 1);
+        } else {
+            data1 = data;
+        }
+        return data1;
+    }
+
     /**
      * @param args
      * @throws Exception
@@ -171,11 +237,13 @@ public class RSAUtil {
         byte[] publicKey = RSAUtil.getPublicKey(keyMap);
         //私钥
         byte[] privateKey = RSAUtil.getPrivateKey(keyMap);
-        System.out.println("公钥：/n" + Base64.encodeBase64String(publicKey));
-        System.out.println("私钥：/n" + Base64.encodeBase64String(privateKey));
+        System.out.println("公钥：" + Base64.encodeBase64String(publicKey));
+        System.out.println("C#公钥：" + getRSAPublicKeyAsNetFormat(publicKey));
+        System.out.println("私钥：" + Base64.encodeBase64String(privateKey));
+        System.out.println("C#私钥：" + getRSAPrivateKeyAsNetFormat(privateKey));
         System.out.println("================密钥对构造完毕,甲方将公钥公布给乙方，开始进行加密数据的传输=============");
         String str = "RSA密码交换算法";
-        System.out.println("/n===========甲方向乙方发送加密数据==============");
+        System.out.println("===========甲方向乙方发送加密数据==============");
         System.out.println("原文:" + str);
         //甲方进行数据的加密
         byte[] code1 = RSAUtil.encryptByPrivateKey(str.getBytes(), privateKey);
@@ -185,7 +253,7 @@ public class RSAUtil {
         byte[] decode1 = RSAUtil.decryptByPublicKey(code1, publicKey);
         System.out.println("乙方解密后的数据：" + new String(decode1));
 
-        System.out.println("===========反向进行操作，乙方向甲方发送数据==============/n/n");
+        System.out.println("===========反向进行操作，乙方向甲方发送数据==============");
 
         str = "乙方向甲方发送数据RSA算法";
 
@@ -202,5 +270,41 @@ public class RSAUtil {
         //甲方使用私钥对数据进行解密
         byte[] decode2 = RSAUtil.decryptByPrivateKey(code2, privateKey);
         System.out.println("甲方解密后的数据：" + new String(decode2));
+    }
+
+
+    public static void main2(String[] args) throws Exception {
+        String data= "N1C/KA/kia3/9pBPbEeE2eHEy8R8wd04E9TDvmWqPZOqEXfq27VK/OoMvvUPnB4wJJnu0S8UjP83ajY3dKZluA==";
+        String k = "MIIBVQIBADANBgkqhkiG9w0BAQEFAASCAT8wggE7AgEAAkEAlKbvV+TbA6tAc+q+RTFF5CqNjgqpayrWFCTK1TYtpZ69dFGhIkKnKpT4nTHs9wFyTY8CfnyziWWhneILpoxjpwIDAQABAkAxEzuJBODZQTwyCJlwNmggf3vkHNj5rFaop8zevtgrCM8lTpbtkbDlz/Y90ifhn00eHbaWx4cOXwBVG3g7p6eBAiEA3VsVh6TgE8MMhH2ailRPI5BTKAPKXxB1Fz6qwechg/cCIQCr6uEtvpiwwQVmeMDraufl/AFY1zLmXSIn+YJh8WXR0QIgRws2y8RFDtKpL9TIRuFsTPPDXLJqvzwe+IjqcTVncl0CIQCJ0NPM8QLEhyfGGr1Eu8HFCz0lM/Z412Y/N3S/AV5HUQIhAMTCITa1fmz3nRxH4L7EofGMniZ+xCC0Pk3G1BbxXlSo";
+        byte[] decode2 = RSAUtil.decryptByPrivateKey(Base64.decodeBase64(data), Base64.decodeBase64(k));
+        System.out.println("甲方解密后的数据：" + new String(decode2));
+    }
+
+    public static void main3(String[] args) throws Exception {
+        //私钥
+        String privateStr = "MIIBVAIBADANBgkqhkiG9w0BAQEFAASCAT4wggE6AgEAAkEAtmEBC5xciJySRAqchSYQR5tnEzsKO/dK0Fg1dVBKKPPwETD5HrQqcDPegRwoiZm8ASpVA2MKZd0iBHFU/M7wNQIDAQABAkEAtK25OWV4jqZ+iQXyNj6VVjtwjC6rXukIpwscOtKGBbalCLgRAs8Q0ZePqe9Duj3/vE8/ZZuTXjSlsJlVSCp/aQIhAPdo8I2aLJrkm/om/CtUHvlW1TCw14eP28zvChQzIx4zAiEAvLYMMVcHD7pe+Xj0hfnc+rmai/64zcjP4VpknqHI//cCIF8bRwWYE7eDU/ZokB1z2+hLme56vI+PHJZ9+Wjkc4aDAiBdJ0Rnir06n1ZIsdOK2yehQMOwfaH+OzWa2YM350cQSwIgOscoD26vCWCF3Q35Tn16RgRYSSyk28s+uqZs1Ld4PvU=";
+        System.out.println("java私钥:"+privateStr);
+        byte[] privateBytes = Base64.decodeBase64(privateStr);
+        //转换C#私钥
+        String dotnetPrivateStr = getRSAPrivateKeyAsNetFormat(privateBytes);
+        System.out.println("C#私钥:" + dotnetPrivateStr);
+        //公钥
+        String publicStr = "MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBALZhAQucXIickkQKnIUmEEebZxM7Cjv3StBYNXVQSijz8BEw+R60KnAz3oEcKImZvAEqVQNjCmXdIgRxVPzO8DUCAwEAAQ==";
+        System.out.println("java公钥:"+publicStr);
+        byte[] publicBytes = Base64.decodeBase64(publicStr);
+        //转换C#公钥
+        String dotnetPublic = getRSAPublicKeyAsNetFormat(publicBytes);
+        System.out.println("C#公钥:" + dotnetPublic);
+
+        String content = "{userName:\"admin\", password:\"asdf1234\"}";
+
+        byte[] encryptByPublic = RSAUtil.encryptByPublicKey(content.getBytes(), publicBytes);
+        System.out.println("===========甲方使用公钥对数据进行加密==============");
+        System.out.println("加密后的数据：" + Base64.encodeBase64String(encryptByPublic));
+        //加密后的数据：pDm5Ge+2N16d7PbyeucjK7QYq7bWWqbZ7WiIv6706gLwuwyG088/AMTlloeDihSkQkP4sRyxS0ivY9UACNVVdg==
+        System.out.println("===========甲方使用私钥对数据进行解密==============");
+        //甲方使用私钥对数据进行解密
+        byte[] decryptByPrivate = RSAUtil.decryptByPrivateKey(encryptByPublic, privateBytes);
+        System.out.println("乙方解密后的数据：" + new String(decryptByPrivate));
     }
 }
