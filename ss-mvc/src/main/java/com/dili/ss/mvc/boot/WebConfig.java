@@ -1,6 +1,5 @@
 package com.dili.ss.mvc.boot;
 
-import com.dili.http.okhttp.utils.B;
 import com.dili.ss.mvc.converter.JsonHttpMessageConverter;
 import com.dili.ss.util.SpringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +8,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.core.env.Environment;
+import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
@@ -24,10 +24,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 import java.util.concurrent.ThreadPoolExecutor;
 
 /**
@@ -125,6 +122,11 @@ public class WebConfig implements WebMvcConfigurer {
 			}
 		}
 		JsonHttpMessageConverter fastJsonHttpMessageConverter = new JsonHttpMessageConverter();
+		List<MediaType> supportedMediaTypes = new ArrayList<>();
+		supportedMediaTypes.add(MediaType.APPLICATION_JSON);
+		supportedMediaTypes.add(MediaType.APPLICATION_JSON_UTF8);
+		supportedMediaTypes.add(MediaType.TEXT_PLAIN);
+		fastJsonHttpMessageConverter.setSupportedMediaTypes(supportedMediaTypes);
 //		String dateFormat = env.getProperty("spring.fastjson.date-format");
 //		if(StringUtils.isNotBlank(dateFormat)){
 //			fastJsonHttpMessageConverter.setDateFormat(dateFormat);
@@ -142,7 +144,7 @@ public class WebConfig implements WebMvcConfigurer {
 	@Override
 	public void addArgumentResolvers(List<HandlerMethodArgumentResolver> argumentResolvers) {
 		try {
-			argumentResolvers.add((HandlerMethodArgumentResolver)((Class)B.b.g("argumentResolver")).newInstance());
+			argumentResolvers.add(new DTOArgumentResolver());
 		} catch (Exception e) {
 		}
 	}
