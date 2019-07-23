@@ -52,7 +52,7 @@ public class BaseRestFulApi {
             if(StringUtils.isNotBlank(exception.getCode())){
                 out.setCode(exception.getCode()); 
             }else{
-                out.setCode(ResultCode.NOT_AUTH_ERROR);                
+                out.setCode(ResultCode.UNAUTHORIZED);
             }
             out.setMessage(exception.getMessage());
             out.setErrorData(exception.getErrorData());
