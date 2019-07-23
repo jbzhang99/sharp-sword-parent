@@ -62,7 +62,7 @@ public class BeanConver {
     public static<T, K> K copyMap(Map map, Class<K> target){
         try {
             K result = (K)target.newInstance();
-            org.springframework.beans.BeanUtils.copyProperties(result, map);
+            org.springframework.beans.BeanUtils.copyProperties(map, result);
             return result;
         } catch (Exception e) {
             LOG.error("实例转换出错");
