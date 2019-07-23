@@ -16,8 +16,10 @@ import org.springframework.cglib.beans.BeanCopier;
 import java.beans.BeanInfo;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -54,20 +56,32 @@ public class BeanConver {
     /**
      * 拷贝Map到Bean
      * @param map
-     * @param target
+     * @param beanClass
      * @param <T>
-     * @param <K>
      * @return
      */
-    public static<T, K> K copyMap(Map map, Class<K> target){
-        try {
-            K result = (K)target.newInstance();
-            org.springframework.beans.BeanUtils.copyProperties(map, result);
-            return result;
-        } catch (Exception e) {
-            LOG.error("实例转换出错");
+    public static <T> T copyMap(Map<String, Object> map, Class<T> beanClass){
+        if (map == null) {
             return null;
         }
+        Object obj = null;
+        try {
+            obj = beanClass.newInstance();
+            Field[] fields = obj.getClass().getDeclaredFields();
+            for (Field field : fields) {
+                int mod = field.getModifiers();
+                if(Modifier.isStatic(mod) || Modifier.isFinal(mod)){
+                    continue;
+                }
+                field.setAccessible(true);
+                field.set(obj, map.get(field.getName()));
+            }
+        } catch (InstantiationException e) {
+            return null;
+        } catch (IllegalAccessException e) {
+            return null;
+        }
+        return (T)obj;
     }
 
     private static boolean hasMethod(Class clazz, String methodName, Class<?>... parameterTypes ){
