@@ -9,17 +9,17 @@
 
     @media only screen and (min-width: 1360px) {
         #${_containerId!"swiperContainer"} {
-            width: 780px;
+            width: 820px;
         }
     }
     @media only screen and (min-width: 1440px) {
         #${_containerId!"swiperContainer"} {
-            width: 860px;
+            width: 900px;
         }
     }
     @media only screen and (min-width: 1920px) {
         #${_containerId!"swiperContainer"} {
-            width: 1320px;
+            width: 1400px;
         }
     }
     .swiper-slide {

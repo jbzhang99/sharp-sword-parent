@@ -128,7 +128,7 @@ public class MenubuttonSwiperTag extends Tag {
 
 		StringBuilder stringBuilder = new StringBuilder();
 		stringBuilder.append("<div id=\""+divId+"\" class=\"easyui-panel swiper-container\" align=\""+panelAlign+"\" style=\"padding:1px;\">"+ LINE_SEPARATOR);
-		stringBuilder.append("<div id=\""+containerId+"\" class=\"swiper-container\">");
+		stringBuilder.append("<div id=\""+containerId+"\" >");
 		stringBuilder.append("<div class=\"swiper-wrapper\">");
 		for(Object root : rootList) {
 			//校验text和id必须有
