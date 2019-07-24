@@ -29,45 +29,56 @@ public class BaseDomain implements IBaseDomain {
 	@Transient
 	private Map metadata;
 
+	@Override
 	public Long getId() {
 		return id;
 	}
+	@Override
 	public void setId(Long id) {
 		this.id = id;
 	}
 
+	@Override
 	public Integer getPage() {
 		return page;
 	}
 
+	@Override
 	public void setPage(Integer page) {
 		this.page = page;
 	}
 
+	@Override
 	public Integer getRows() {
 		return rows;
 	}
 
+	@Override
 	public void setRows(Integer rows) {
 		this.rows = rows;
 	}
 
+	@Override
 	public String getSort() {
 		return sort;
 	}
 
+	@Override
 	public void setSort(String sort) {
 		this.sort = sort;
 	}
 
+	@Override
 	public String getOrder() {
 		return order;
 	}
 
+	@Override
 	public void setOrder(String order) {
 		this.order = order;
 	}
 
+	@Override
 	public void setMetadata(String key, Object value){
 		if(metadata == null){
 			metadata = new HashMap();
@@ -75,14 +86,17 @@ public class BaseDomain implements IBaseDomain {
 		metadata.put(key, value);
 	}
 
+	@Override
 	public Object getMetadata(String key){
 		return metadata == null ? null : metadata.get(key);
 	}
 
+	@Override
 	public Map getMetadata() {
 		return metadata;
 	}
 
+	@Override
 	public void setMetadata(Map metadata) {
 		this.metadata = metadata;
 	}
@@ -92,9 +106,8 @@ public class BaseDomain implements IBaseDomain {
 	 * @param key
 	 * @return
 	 */
+	@Override
 	public Boolean containsMetadata(String key) {
-		if(metadata != null)
-			return metadata.containsKey(key);
-		return false;
+		return metadata == null?false:metadata.containsKey(key);
 	}
 }
