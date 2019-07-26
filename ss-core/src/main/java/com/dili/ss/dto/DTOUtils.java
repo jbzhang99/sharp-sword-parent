@@ -74,7 +74,7 @@ public class DTOUtils {
 	}
 
 	/**
-	 * 获取代理对象
+	 * 获取代理对象，支持默认方法
 	 * @param obj
 	 * @return
 	 */
@@ -210,8 +210,6 @@ public class DTOUtils {
 	 * @return proxyClz不是接口或者没有父接口，有可能出DTOProxyException异常
 	 */
 	public static <T extends IDTO> T proxy(DTO realObj, Class<T> proxyClz) {
-		assert (realObj != null);
-		assert (proxyClz != null);
 		T dto = internalProxy(realObj, proxyClz, DTOHandler.class);
 		dto.mset(realObj.getMetadata());
 		return dto;
@@ -448,10 +446,6 @@ public class DTOUtils {
 	@SuppressWarnings("unchecked")
 	final static <T extends IDTO> T internalProxy(DTO realObj,
 	                                              Class<T> proxyClz, Class<? extends DTOHandler> handlerClazz) {
-		assert (handlerClazz != null);
-		assert (realObj != null);
-		assert (proxyClz != null);
-
 		T retval = null;
 		// 如果是接口方式,则直接根据接口来创建
 		if (proxyClz.isInterface()) {
@@ -472,7 +466,7 @@ public class DTOUtils {
 				throw new DTOProxyException(message);
 			}
 		}
-		// 加入缺省值
+//		 加入缺省值
 		generateDefaultValue(realObj, proxyClz);
 		return retval;
 	}

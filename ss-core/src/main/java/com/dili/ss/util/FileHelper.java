@@ -62,7 +62,7 @@ public class FileHelper {
             throws FileNotFoundException {
         InputStream inputStream = null;
         if (file.startsWith("classpath:")) {
-            inputStream = ClassHelper.getDefaultClassLoader()
+            inputStream = ClassUtils.getDefaultClassLoader()
                     .getResourceAsStream(file.substring("classpath:".length()));
         } else {
             inputStream = new FileInputStream(file);
@@ -128,7 +128,7 @@ public class FileHelper {
         if (pathToUse.startsWith("/")) {
             pathToUse = pathToUse.substring(1);
         }
-        Enumeration<URL> urls = ClassHelper.getDefaultClassLoader()
+        Enumeration<URL> urls = ClassUtils.getDefaultClassLoader()
                 .getResources(pathToUse);
         while (urls.hasMoreElements()) {
             return new File(urls.nextElement().getFile());

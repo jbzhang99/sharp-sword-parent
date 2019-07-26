@@ -16,7 +16,7 @@ import java.util.Map;
 /**
  * Created by asiam on 2018/7/4 0004.
  */
-public class ExcelUtil {
+public class ExcelUtils {
 
     private static final String EXCEL_XLS = "xls";
     private static final String EXCEL_XLSX = "xlsx";

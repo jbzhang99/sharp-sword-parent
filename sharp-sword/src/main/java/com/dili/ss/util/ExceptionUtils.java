@@ -7,7 +7,7 @@ import java.io.PrintStream;
  * 异常处理工具类
  * Created by asiamaster on 2017/12/4 0004.
  */
-public class ExceptionUtil {
+public class ExceptionUtils {
 	/**
 	 * 创建异常堆栈信息
 	 * @param message

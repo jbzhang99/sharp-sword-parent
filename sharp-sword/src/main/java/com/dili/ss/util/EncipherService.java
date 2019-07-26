@@ -32,9 +32,9 @@ public class EncipherService {
      */
     public String encryptByPublicKey(String data, String key) throws Exception {
         String desKey = RandomString.createRandomString(32);
-        String encodeData = DESUtil.encrypt(data, null, desKey);
-        byte[] encryptDesKey = RSAUtil.encryptByPublicKey(desKey.getBytes(), Base64.decodeBase64(publicKey));
-        desKey = DESUtil.parseByte2HexStr(encryptDesKey);
+        String encodeData = DESUtils.encrypt(data, null, desKey);
+        byte[] encryptDesKey = RSAUtils.encryptByPublicKey(desKey.getBytes(), Base64.decodeBase64(publicKey));
+        desKey = DESUtils.parseByte2HexStr(encryptDesKey);
         JSONObject jo = new JSONObject();
         jo.put(KEY, desKey);
         jo.put(DATA, encodeData);
@@ -50,10 +50,10 @@ public class EncipherService {
     public String decryptByPrivateKey(String json, String key) throws Exception {
         JSONObject jo = JSON.parseObject(json);
         String encodedDesKey = jo.getString(KEY);
-        byte[] encodedDesKeyBytes = DESUtil.parseHexStr2Byte(encodedDesKey);
+        byte[] encodedDesKeyBytes = DESUtils.parseHexStr2Byte(encodedDesKey);
         String encodedData = jo.getString(DATA);
-        String desKey = new String(RSAUtil.decryptByPrivateKey(encodedDesKeyBytes, Base64.decodeBase64(privateKey)));
-        return DESUtil.decrypt(encodedData, null, desKey);
+        String desKey = new String(RSAUtils.decryptByPrivateKey(encodedDesKeyBytes, Base64.decodeBase64(privateKey)));
+        return DESUtils.decrypt(encodedData, null, desKey);
     }
 
     public static void main1(String[] args) throws Exception {
@@ -90,8 +90,8 @@ public class EncipherService {
                 "        ]\n" +
                 "    }\n" +
                 "}";
-        String data1 = DESUtil.encrypt(json, null, "12345678");
-        System.out.println(DESUtil.decrypt(data1, null, "12345678"));
+        String data1 = DESUtils.encrypt(json, null, "12345678");
+        System.out.println(DESUtils.decrypt(data1, null, "12345678"));
 
 
         EncipherService encipherService = new EncipherService();

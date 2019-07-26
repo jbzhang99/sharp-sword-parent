@@ -7,7 +7,7 @@ import java.util.regex.Pattern;
  * 以下是比较完善的判断方法
  * Created by asiamaster on 2017/11/14 0014.
  */
-public class CharUtil {
+public class CharUtils {
 
 	// 根据Unicode编码完美的判断中文汉字和符号
 	private static boolean isChinese(char c) {

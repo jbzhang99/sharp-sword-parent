@@ -1,30 +1,21 @@
 package com.dili.ss.util;
 
-import com.google.zxing.BarcodeFormat;
-import com.google.zxing.BinaryBitmap;
-import com.google.zxing.DecodeHintType;
-import com.google.zxing.EncodeHintType;
-import com.google.zxing.LuminanceSource;
-import com.google.zxing.MultiFormatReader;
-import com.google.zxing.MultiFormatWriter;
-import com.google.zxing.Result;
-import com.google.zxing.WriterException;
+import com.google.zxing.*;
 import com.google.zxing.client.j2se.BufferedImageLuminanceSource;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.common.HybridBinarizer;
 
 import javax.imageio.ImageIO;
-
-import java.io.File;
-import java.io.OutputStream;
-import java.io.IOException;
-import java.util.Hashtable;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.Hashtable;
 
 /**
  * 使用ZXing3.3.3，生成条码的辅助类。可以编码、解码。编码使用code包，解码需要javase包。
  */
-public final class MatrixUtil {
+public final class MatrixUtils {
 
     private static final String CHARSET = "utf-8";
     private static final int BLACK = 0xFF000000;
@@ -33,7 +24,7 @@ public final class MatrixUtil {
     /**
      * 禁止生成实例，生成实例也没有意义。
      */
-    private MatrixUtil() {
+    private MatrixUtils() {
     }
 
     /**
@@ -65,7 +56,7 @@ public final class MatrixUtil {
         }
         // 生成二维码
         // File outputFile = new File("d:"+File.separator+"new.gif");
-        // MatrixUtil.writeToFile(bitMatrix, format, outputFile);
+        // MatrixUtils.writeToFile(bitMatrix, format, outputFile);
         return bitMatrix;
     }
 

@@ -19,7 +19,7 @@ import java.util.Map;
  *
  * @author asiamaster
  */
-public class RSAUtil {
+public class RSAUtils {
     //非对称密钥算法
     public static final String KEY_ALGORITHM = "RSA";
 
@@ -232,11 +232,11 @@ public class RSAUtil {
     public static void main1(String[] args) throws Exception {
         //初始化密钥
         //生成密钥对
-        Map<String, Object> keyMap = RSAUtil.initKey();
+        Map<String, Object> keyMap = RSAUtils.initKey();
         //公钥
-        byte[] publicKey = RSAUtil.getPublicKey(keyMap);
+        byte[] publicKey = RSAUtils.getPublicKey(keyMap);
         //私钥
-        byte[] privateKey = RSAUtil.getPrivateKey(keyMap);
+        byte[] privateKey = RSAUtils.getPrivateKey(keyMap);
         System.out.println("公钥：" + Base64.encodeBase64String(publicKey));
         System.out.println("C#公钥：" + getRSAPublicKeyAsNetFormat(publicKey));
         System.out.println("私钥：" + Base64.encodeBase64String(privateKey));
@@ -246,11 +246,11 @@ public class RSAUtil {
         System.out.println("===========甲方向乙方发送加密数据==============");
         System.out.println("原文:" + str);
         //甲方进行数据的加密
-        byte[] code1 = RSAUtil.encryptByPrivateKey(str.getBytes(), privateKey);
+        byte[] code1 = RSAUtils.encryptByPrivateKey(str.getBytes(), privateKey);
         System.out.println("加密后的数据：" + Base64.encodeBase64String(code1));
         System.out.println("===========乙方使用甲方提供的公钥对数据进行解密==============");
         //乙方进行数据的解密
-        byte[] decode1 = RSAUtil.decryptByPublicKey(code1, publicKey);
+        byte[] decode1 = RSAUtils.decryptByPublicKey(code1, publicKey);
         System.out.println("乙方解密后的数据：" + new String(decode1));
 
         System.out.println("===========反向进行操作，乙方向甲方发送数据==============");
@@ -260,7 +260,7 @@ public class RSAUtil {
         System.out.println("原文:" + str);
 
         //乙方使用公钥对数据进行加密
-        byte[] code2 = RSAUtil.encryptByPublicKey(str.getBytes(), publicKey);
+        byte[] code2 = RSAUtils.encryptByPublicKey(str.getBytes(), publicKey);
         System.out.println("===========乙方使用公钥对数据进行加密==============");
         System.out.println("加密后的数据：" + Base64.encodeBase64String(code2));
 
@@ -268,7 +268,7 @@ public class RSAUtil {
         System.out.println("===========甲方使用私钥对数据进行解密==============");
 
         //甲方使用私钥对数据进行解密
-        byte[] decode2 = RSAUtil.decryptByPrivateKey(code2, privateKey);
+        byte[] decode2 = RSAUtils.decryptByPrivateKey(code2, privateKey);
         System.out.println("甲方解密后的数据：" + new String(decode2));
     }
 
@@ -276,7 +276,7 @@ public class RSAUtil {
     public static void main2(String[] args) throws Exception {
         String data= "N1C/KA/kia3/9pBPbEeE2eHEy8R8wd04E9TDvmWqPZOqEXfq27VK/OoMvvUPnB4wJJnu0S8UjP83ajY3dKZluA==";
         String k = "MIIBVQIBADANBgkqhkiG9w0BAQEFAASCAT8wggE7AgEAAkEAlKbvV+TbA6tAc+q+RTFF5CqNjgqpayrWFCTK1TYtpZ69dFGhIkKnKpT4nTHs9wFyTY8CfnyziWWhneILpoxjpwIDAQABAkAxEzuJBODZQTwyCJlwNmggf3vkHNj5rFaop8zevtgrCM8lTpbtkbDlz/Y90ifhn00eHbaWx4cOXwBVG3g7p6eBAiEA3VsVh6TgE8MMhH2ailRPI5BTKAPKXxB1Fz6qwechg/cCIQCr6uEtvpiwwQVmeMDraufl/AFY1zLmXSIn+YJh8WXR0QIgRws2y8RFDtKpL9TIRuFsTPPDXLJqvzwe+IjqcTVncl0CIQCJ0NPM8QLEhyfGGr1Eu8HFCz0lM/Z412Y/N3S/AV5HUQIhAMTCITa1fmz3nRxH4L7EofGMniZ+xCC0Pk3G1BbxXlSo";
-        byte[] decode2 = RSAUtil.decryptByPrivateKey(Base64.decodeBase64(data), Base64.decodeBase64(k));
+        byte[] decode2 = RSAUtils.decryptByPrivateKey(Base64.decodeBase64(data), Base64.decodeBase64(k));
         System.out.println("甲方解密后的数据：" + new String(decode2));
     }
 
@@ -298,13 +298,13 @@ public class RSAUtil {
 
         String content = "{userName:\"admin\", password:\"asdf1234\"}";
 
-        byte[] encryptByPublic = RSAUtil.encryptByPublicKey(content.getBytes(), publicBytes);
+        byte[] encryptByPublic = RSAUtils.encryptByPublicKey(content.getBytes(), publicBytes);
         System.out.println("===========甲方使用公钥对数据进行加密==============");
         System.out.println("加密后的数据：" + Base64.encodeBase64String(encryptByPublic));
-
+        //加密后的数据：pDm5Ge+2N16d7PbyeucjK7QYq7bWWqbZ7WiIv6706gLwuwyG088/AMTlloeDihSkQkP4sRyxS0ivY9UACNVVdg==
         System.out.println("===========甲方使用私钥对数据进行解密==============");
         //甲方使用私钥对数据进行解密
-        byte[] decryptByPrivate = RSAUtil.decryptByPrivateKey(encryptByPublic, privateBytes);
+        byte[] decryptByPrivate = RSAUtils.decryptByPrivateKey(encryptByPublic, privateBytes);
         System.out.println("乙方解密后的数据：" + new String(decryptByPrivate));
     }
 }

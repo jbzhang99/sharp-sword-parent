@@ -1,7 +1,7 @@
 package com.dili.ss.util;
 
 
-public class ClassHelper {
+public class ClassUtils {
 
 	public static Object newInstance(Class<?> c) {
 		try {
@@ -43,7 +43,7 @@ public class ClassHelper {
 		}
 		if (cl == null) {
 			// No thread context class loader -> use class loader of this class.
-			cl = ClassHelper.class.getClassLoader();
+			cl = ClassUtils.class.getClassLoader();
 		}
 		return cl;
 	}

@@ -1,21 +1,18 @@
 package com.dili.ss.util;
 
-import org.apache.commons.codec.binary.Base64;
-
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.DESKeySpec;
 import java.nio.charset.Charset;
-import java.security.*;
-import java.util.Map;
+import java.security.SecureRandom;
 
 /**
  * DES对称算法组件
  *
  * @author asiamaster
  */
-public class DESUtil {
+public class DESUtils {
     //DES密钥算法
     public static final String KEY_ALGORITHM = "DES";
 
