@@ -210,9 +210,7 @@ public class DTOUtils {
 	 * @return proxyClz不是接口或者没有父接口，有可能出DTOProxyException异常
 	 */
 	public static <T extends IDTO> T proxy(DTO realObj, Class<T> proxyClz) {
-		T dto = internalProxy(realObj, proxyClz, DTOHandler.class);
-		dto.mset(realObj.getMetadata());
-		return dto;
+		return internalProxy(realObj, proxyClz, DTOHandler.class);
 	}
 
 	/**

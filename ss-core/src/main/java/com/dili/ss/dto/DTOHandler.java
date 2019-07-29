@@ -16,7 +16,6 @@ import java.io.Serializable;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -35,8 +34,6 @@ public class DTOHandler<T extends DTO> implements InvocationHandler, Serializabl
 	// 委托对象
 	private T delegate;
 
-	private Map<String, Object> metadata;
-
 	/**
 	 * 约定的构造器
 	 *
@@ -46,7 +43,6 @@ public class DTOHandler<T extends DTO> implements InvocationHandler, Serializabl
 	public DTOHandler(Class<?> proxyClazz, T delegate) {
 		this.proxyClazz = proxyClazz;
 		this.delegate = delegate;
-		metadata = new HashMap<String, Object>(4);
 	}
 
 	/**
@@ -144,20 +140,20 @@ public class DTOHandler<T extends DTO> implements InvocationHandler, Serializabl
 			return delegate.put(((String) args[0]), args[1]);
 		} else if ("mget".equals(method.getName())) {
 			if(args == null) {
-				return metadata;
+				return delegate.getMetadata();
 			}else {
-				return metadata.get(args[0]);
+				return delegate.getMetadata((String)args[0]);
 			}
 		} else if ("mset".equals(method.getName())) {
 			if(args.length == 1 && args[0] instanceof Map){
-				metadata.putAll((Map) args[0]);
+				delegate.getMetadata().putAll((Map) args[0]);
 				return null;
 			}else {
-				return metadata.put(((String) args[0]), args[1]);
+				return delegate.setMetadata(((String) args[0]), args[1]);
 			}
 		} else if ("toString".equals(method.getName()) && args == null) {
 			String data = delegate == null ? "" : JSON.toJSONString(delegate);
-			String meta = metadata == null ? "" : JSON.toJSONString(metadata);
+			String meta = JSON.toJSONString(delegate.getMetadata());
 			StringBuilder stringBuilder = new StringBuilder(proxyClazz.getName());
 			stringBuilder.append("\r\ndata:").append(data).append("\r\nmeta:").append(meta);
 			return stringBuilder.toString();
@@ -206,7 +202,7 @@ public class DTOHandler<T extends DTO> implements InvocationHandler, Serializabl
 	 * @return
 	 */
 	public Map<String, Object> getMetadata() {
-		return metadata;
+		return delegate.getMetadata();
 	}
 
 	void setProxyClazz(Class<?> proxyClazz) {

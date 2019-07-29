@@ -134,4 +134,5 @@ public class ResultCode {
      */
     public static final String NOT_AUTH_ERROR="6000";
 
+
 }
