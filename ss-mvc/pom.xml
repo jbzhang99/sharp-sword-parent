@@ -25,7 +25,7 @@
     <parent>
 		<artifactId>sharp-sword-parent</artifactId>
 		<groupId>com.dili</groupId>
-		<version>3.2.8-SNAPSHOT</version>
+		<version>3.2.9-SNAPSHOT</version>
 	</parent>
 
     <build>
@@ -149,7 +149,7 @@
         <dependency>
             <groupId>io.springfox</groupId>
             <artifactId>springfox-swagger2</artifactId>
-            <version>2.4.0</version>
+            <version>2.9.2</version>
         </dependency>
 <!--        <dependency>-->
 <!--            <groupId>io.springfox</groupId>-->
@@ -159,7 +159,7 @@
         <dependency>
             <groupId>io.swagger</groupId>
             <artifactId>swagger-annotations</artifactId>
-            <version>1.5.16</version>
+            <version>1.5.22</version>
         </dependency>
         <!-- springloaded -->
         <!-- https://mvnrepository.com/artifact/org.springframework/springloaded -->
