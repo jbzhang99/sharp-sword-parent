@@ -129,5 +129,9 @@ public class ResultCode {
      */
     public static final String APP_ERROR="5000";
 
+    /**
+     * 6000：权限错误(未登录，数据权限不满足，功能权限不满足等错误)<br/>
+     */
+    public static final String NOT_AUTH_ERROR="6000";
 
 }
