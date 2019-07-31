@@ -292,7 +292,7 @@ public class DTOUtils {
 		if(source==null||proxyClz==null) return null;
 		T temp = DTOUtils.newDTO(proxyClz);
 		try {
-			org.springframework.beans.BeanUtils.copyProperties(temp, source);
+			org.springframework.beans.BeanUtils.copyProperties(source, temp);
 		}catch(Exception e) {
 			e.printStackTrace(System.err);
 		}
