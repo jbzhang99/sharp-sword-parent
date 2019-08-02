@@ -7,6 +7,7 @@ import java.util.Map;
 /**
  * 基础查询类
  */
+@Deprecated
 //@ApiModel(value = "baseQuery",description = "查询基础类")
 public class BaseQuery implements Serializable {
 
