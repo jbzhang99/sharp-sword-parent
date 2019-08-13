@@ -27,12 +27,15 @@ import java.util.Map;
 
 /**
  * Created by asiamastor on 2017/1/9.
+ * 处理JavaBean和JavaBean转Map相关的逻辑
  */
 public class BeanConver {
     private final static Logger LOG = LoggerFactory.getLogger(BeanConver.class);
 
     /**
      * 实例类转换
+     * 支持DTO、DTOInstance和javaBean转为javaBean
+     * 不支持转为DTO
      * @param source 源对象
      * @param target 目标对象
      * @param <T> 源对象
@@ -54,9 +57,9 @@ public class BeanConver {
     }
 
     /**
-     * 拷贝Map到Bean
+     * 拷贝Map到javaBean或DTOInstance
      * @param map
-     * @param beanClass
+     * @param beanClass javaBean类或DTOInstance接口类
      * @param <T>
      * @return
      */
@@ -66,7 +69,7 @@ public class BeanConver {
         }
         Object obj = null;
         try {
-            obj = beanClass.newInstance();
+            obj = beanClass.isInterface() ? DTOUtils.newInstance((Class)beanClass) : beanClass.newInstance();
             Field[] fields = obj.getClass().getDeclaredFields();
             for (Field field : fields) {
                 int mod = field.getModifiers();
@@ -84,15 +87,126 @@ public class BeanConver {
         return (T)obj;
     }
 
-    private static boolean hasMethod(Class clazz, String methodName, Class<?>... parameterTypes ){
-        try {
-            clazz.getMethod(methodName, parameterTypes);
-            return true;
-        } catch (NoSuchMethodException e) {
-//            e.printStackTrace();
-            return false;
+    /**
+     * page实例类转换
+     * @param <T> 源对象
+     * @param <K> 目标对象
+     * @param source 源对象
+     * @param target 目标对象
+     * @return
+     */
+    public static <T,K> List<K> copeList(List<T> source, Class<K> target){
+        List<K> list = new ArrayList<K>();
+        if(CollectionUtils.isEmpty(source)){
+            return new ArrayList<>();
         }
+        BeanCopier beanCopier = BeanCopier.create(source.get(0).getClass(),target,false);
+        for(T af : source){
+            K af1 = null;
+            try {
+                af1 = (K)target.newInstance();
+            } catch (Exception e) {
+                LOG.error("实例转换出错");
+            }
+            beanCopier.copy(af,af1,null);
+            list.add(af1);
+        }
+        return list;
     }
+
+
+    /**
+     * 把javaBean、Instance或dto对象转换为Map键值对
+     *
+     * @param bean or dto
+     * @param type 转换的类型
+     * @param recursive 向上递归
+     * @return
+     * @throws Exception
+     */
+    public static Map<String, Object> transformObjectToMap(Object bean, Class<?> type, boolean recursive) throws Exception {
+        if(bean instanceof Map){
+            return (Map) bean;
+        }
+        if(DTOUtils.isProxy(bean)){
+            DTO dto = null;
+            try {
+                dto = DTOUtils.goByDef(bean);
+            } catch (Throwable throwable) {
+                throw new AppException(throwable.getMessage());
+            }
+            return dto;
+        }
+        Map<String, Object> returnMap = new HashMap<String, Object>();
+        if(recursive){
+            if(type.getSuperclass() != null && !type.getSuperclass().equals(Object.class)){
+                returnMap.putAll(transformObjectToMap(bean, type.getSuperclass(), true));
+            }
+            if(type.getInterfaces() != null && type.getInterfaces().length > 0){
+                for(Class<?> intf : type.getInterfaces()){
+                    returnMap.putAll(transformObjectToMap(bean, intf, true));
+                }
+            }
+        }
+        BeanInfo beanInfo = Introspector.getBeanInfo(type);
+        PropertyDescriptor[] propertyDescriptors = beanInfo.getPropertyDescriptors();
+        for (int i = 0; i < propertyDescriptors.length; i++) {
+            PropertyDescriptor descriptor = propertyDescriptors[i];
+            String propertyName = descriptor.getName();
+            if (!"class".equals(propertyName)) {
+                Method readMethod = descriptor.getReadMethod();
+                Object result = readMethod.invoke(bean, new Object[0]);
+                if (result != null) {
+                    returnMap.put(propertyName, result);
+                }
+            }
+        }
+        return returnMap;
+    }
+
+    /**
+     * 把javaBean或dto对象转换为Map键值对
+     *
+     * @param bean or dto
+     * @param recursive 是否向上递归
+     * @return
+     * @throws Exception
+     */
+    public static Map<String, Object> transformObjectToMap(Object bean, boolean recursive) throws Exception {
+        Class<?> clazz = DTOUtils.isProxy(bean) ? DTOUtils.getDTOClass(bean) : bean.getClass();
+        return transformObjectToMap(bean, clazz, recursive);
+    }
+
+    /**
+     * 把javaBean或dto对象转换为Map键值对, 不递归
+     * @param bean or dto
+     * @return
+     * @throws Exception
+     */
+    public static Map<String, Object> transformObjectToMap(Object bean) throws Exception {
+        Class<?> clazz = DTOUtils.isProxy(bean) ? DTOUtils.getDTOClass(bean) : bean.getClass();
+        return transformObjectToMap(bean, clazz, false);
+    }
+
+
+    /**
+     * 将com.github.pagehelper.Page对象转换为我们自已的BasePage对象
+     * @param page
+     * @param <T>
+     * @return
+     */
+    @Deprecated
+    public static <T> BasePage<T> convertPage(Page<T> page){
+        BasePage<T> result = new BasePage<T>();
+        result.setDatas(page.getResult());
+        result.setPage(page.getPageNum());
+        result.setRows(page.getPageSize());
+        result.setTotalItem(Integer.parseInt(String.valueOf(page.getTotal())));
+        result.setTotalPage(page.getPages());
+        result.setStartIndex(page.getStartRow());
+        return result;
+    }
+
 
     /**
      * 拷贝继承BaseQuery的bean
@@ -102,6 +216,7 @@ public class BeanConver {
      * @param <K>
      * @return
      */
+    @Deprecated
     public static <T,K> K copeBaseQueryBean(T source,Class<K> target ){
         K k = copyBean(source, target);
         if(BaseQuery.class.isAssignableFrom(target)){
@@ -161,6 +276,7 @@ public class BeanConver {
      * @param <K> 目标对象
      * @return
      */
+    @Deprecated
     public static <T,K> BasePage<K> copePage(BasePage<T> source, Class<K> target){
         List<K> list = new ArrayList<K>();
         BasePage<K> result = new BasePage<K>();
@@ -184,55 +300,12 @@ public class BeanConver {
     }
 
     /**
-     * page实例类转换
-     * @param <T> 源对象
-     * @param <K> 目标对象
-     * @param source 源对象
-     * @param target 目标对象
-     * @return
-     */
-    public static <T,K> List<K> copeList(List<T> source, Class<K> target){
-        List<K> list = new ArrayList<K>();
-        if(CollectionUtils.isEmpty(source)){
-            return new ArrayList<>();
-        }
-        BeanCopier beanCopier = BeanCopier.create(source.get(0).getClass(),target,false);
-        for(T af : source){
-            K af1 = null;
-            try {
-                af1 = (K)target.newInstance();
-            } catch (Exception e) {
-                LOG.error("实例转换出错");
-            }
-            beanCopier.copy(af,af1,null);
-            list.add(af1);
-        }
-        return list;
-    }
-
-    /**
      * 将com.github.pagehelper.Page对象转换为我们自已的BasePage对象
      * @param page
      * @param <T>
      * @return
      */
-    public static <T> BasePage<T> convertPage(Page<T> page){
-        BasePage<T> result = new BasePage<T>();
-        result.setDatas(page.getResult());
-        result.setPage(page.getPageNum());
-        result.setRows(page.getPageSize());
-        result.setTotalItem(Integer.parseInt(String.valueOf(page.getTotal())));
-        result.setTotalPage(page.getPages());
-        result.setStartIndex(page.getStartRow());
-        return result;
-    }
-
-    /**
-     * 将com.github.pagehelper.Page对象转换为我们自已的BasePage对象
-     * @param page
-     * @param <T>
-     * @return
-     */
+    @Deprecated
     public static <T> BasePage<T> convertPage(PageInfo<T> page){
         BasePage<T> result = new BasePage<T>();
         result.setDatas(page.getList());
@@ -269,87 +342,13 @@ public class BeanConver {
         return result;
     }
 
-    /**
-     * 把javaBean或dto对象转换为Map键值对
-     *
-     * @param bean or dto
-     * @param type 转换的类型
-     * @param recursive 向上递归
-     * @return
-     * @throws Exception
-     */
-    public static Map<String, Object> transformObjectToMap(Object bean, Class<?> type, boolean recursive) throws Exception {
-        if(bean instanceof Map){
-            return (Map) bean;
+    private static boolean hasMethod(Class clazz, String methodName, Class<?>... parameterTypes ){
+        try {
+            clazz.getMethod(methodName, parameterTypes);
+            return true;
+        } catch (NoSuchMethodException e) {
+//            e.printStackTrace();
+            return false;
         }
-        if(DTOUtils.isDTOProxy(bean)){
-            DTO dto = null;
-            try {
-                dto = DTOUtils.goByDef(bean);
-            } catch (Throwable throwable) {
-                throw new AppException(throwable.getMessage());
-            }
-            return dto;
-        }
-        Map<String, Object> returnMap = new HashMap<String, Object>();
-        if(recursive){
-            if(type.getSuperclass() != null && !type.getSuperclass().equals(Object.class)){
-                returnMap.putAll(transformObjectToMap(bean, type.getSuperclass(), true));
-            }
-            if(type.getInterfaces() != null && type.getInterfaces().length > 0){
-                for(Class<?> intf : type.getInterfaces()){
-                    returnMap.putAll(transformObjectToMap(bean, intf, true));
-                }
-            }
-        }
-        BeanInfo beanInfo = Introspector.getBeanInfo(type);
-        PropertyDescriptor[] propertyDescriptors = beanInfo.getPropertyDescriptors();
-        for (int i = 0; i < propertyDescriptors.length; i++) {
-            PropertyDescriptor descriptor = propertyDescriptors[i];
-            String propertyName = descriptor.getName();
-            if (!"class".equals(propertyName)) {
-                Method readMethod = descriptor.getReadMethod();
-                Object result = readMethod.invoke(bean, new Object[0]);
-                if (result != null) {
-                    returnMap.put(propertyName, result);
-                }
-            }
-        }
-        return returnMap;
-    }
-
-    /**
-     * 把javaBean或dto对象转换为Map键值对
-     *
-     * @param bean or dto
-     * @param type 转换的类型
-     * @return
-     * @throws Exception
-     */
-    public static Map<String, Object> transformObjectToMap(Object bean, Class<?> type) throws Exception {
-        return transformObjectToMap(bean, type, false);
-    }
-
-    /**
-     * 把javaBean或dto对象转换为Map键值对
-     *
-     * @param bean or dto
-     * @return
-     * @throws Exception
-     */
-    public static Map<String, Object> transformObjectToMap(Object bean) throws Exception {
-        return DTOUtils.isDTOProxy(bean) ? transformObjectToMap(bean, DTOUtils.getDTOClass(bean)) : transformObjectToMap(bean, bean.getClass());
-    }
-
-
-    /**
-     * 第一个字符小写
-     *
-     * @param value
-     * @return
-     */
-    public static String lowerCaseFirstChar(String value)
-    {
-        return String.valueOf(value.charAt(0)).toLowerCase() + value.substring(1);
     }
 }

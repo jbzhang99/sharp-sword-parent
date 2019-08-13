@@ -106,7 +106,7 @@ public class SsSqlHelper {
             Object _params = wrapCollection(args[0]);
             if (_params instanceof Map) {
                 params.putAll((Map) _params);
-            }else if(DTOUtils.isDTOProxy(_params)){
+            }else if(DTOUtils.isProxy(_params)){
                 params.putAll(DTOUtils.go(_params));
             }else if(null != args[0]){//这种情况应该是单个String或Long等类型的参数
                 return getNamespaceSql(session, fullMapperMethodName, args[0]);

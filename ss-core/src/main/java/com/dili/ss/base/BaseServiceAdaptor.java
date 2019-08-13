@@ -673,6 +673,9 @@ public abstract class BaseServiceAdaptor<T extends IBaseDomain, KEY extends Seri
         if(!POJOUtils.isGetMethod(method)){
             return true;
         }
+        if(method.getParameterTypes().length>0){
+        	return true;
+		}
         Class<?> declaringClass = method.getDeclaringClass();
         //排除IBaseDomain或BaseDomain上定义的基础方法
         if (IBaseDomain.class.equals(declaringClass) || BaseDomain.class.equals(declaringClass)){
@@ -911,7 +914,7 @@ public abstract class BaseServiceAdaptor<T extends IBaseDomain, KEY extends Seri
 	 */
 	private void buildExactDomain(T domain, String fieldName) throws Exception {
 		//如果不是DTO接口，不构建
-		if(!DTOUtils.isDTOProxy(domain)){
+		if(!DTOUtils.isProxy(domain)){
 			return;
 		}
 		//如果未实现IMybatisForceParams接口不构建

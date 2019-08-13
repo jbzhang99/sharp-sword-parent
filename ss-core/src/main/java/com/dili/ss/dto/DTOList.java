@@ -82,7 +82,7 @@ public class DTOList<T extends IDTO> extends AbstractList<T> implements List<T>,
 		// 如果对象不为空
 		if (obj != null) {
 			if (obj instanceof DTO) {
-				retval = DTOUtils.internalAs(obj, dtoClazz, DTOHandler.class);
+				retval = DTOUtils.internalAs(obj, dtoClazz);
 				resDatas.set(index, retval);
 			}  else {
 				retval = (T) obj;
@@ -220,7 +220,7 @@ public class DTOList<T extends IDTO> extends AbstractList<T> implements List<T>,
 		T retval = null;
 		if (obj != null) {
 			if (obj instanceof DTO) {
-				retval = DTOUtils.internalAs(obj, dtoClazz, DTOHandler.class);
+				retval = DTOUtils.internalAs(obj, dtoClazz);
 			} else {
 				retval = (T) obj;
 			}

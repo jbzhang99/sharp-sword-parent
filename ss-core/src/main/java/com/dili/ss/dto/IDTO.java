@@ -28,7 +28,16 @@ public interface IDTO extends Serializable {
 	 */
 	default Object aget(String property){
 		return POJOUtils.getProperty(this, property);
-	};
+	}
+
+	/**
+	 * 代理取值
+	 *
+	 * @return
+	 */
+	default DTO aget(){
+		return new DTO();
+	}
 
 	/**
 	 * 代理设置
@@ -38,7 +47,15 @@ public interface IDTO extends Serializable {
 	 */
 	default void aset(String property, Object value){
 		POJOUtils.setProperty(this, property, value);
-	};
+	}
+
+	/**
+	 * 代理设置
+	 *
+	 * @param dto
+	 */
+	default void aset(DTO dto){
+	}
 
 	/**
 	 * meta取值

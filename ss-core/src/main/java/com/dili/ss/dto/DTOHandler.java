@@ -224,6 +224,10 @@ public class DTOHandler<T extends DTO> implements InvocationHandler, Serializabl
 //		test.aset("job", scheduleJob);
 //		test.aset("number", 6);
 //		test.aset("relationOperator", "Equal");
+//		test.setNames(Lists.newArrayList("name1"));
+//		Map map = new HashMap();
+//		map.put("p1", "n1");
+//		test.setParams(Lists.newArrayList(map));
 //		System.out.println(test.getId());
 //		System.out.println(test.getCreated());
 //		System.out.println(test.getJobName());
@@ -233,9 +237,19 @@ public class DTOHandler<T extends DTO> implements InvocationHandler, Serializabl
 //		System.out.println(test.getJob());
 //		System.out.println(test.getNumber());
 //		System.out.println(test.getRelationOperator());
+//		System.out.println(test.getNames());
+//		System.out.println(test.getParams());
+//
 //	}
 //
 //	interface Test extends ScheduleJob{
+//
+//		List<String> getNames();
+//		void setNames(List<String> names);
+//
+//		List<Map> getParams();
+//		void setParams(List<Map> params);
+//
 //		LocalDateTime getTime();
 //		void setTime(LocalDateTime localDateTime);
 //
