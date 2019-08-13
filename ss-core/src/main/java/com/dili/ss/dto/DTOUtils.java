@@ -252,8 +252,12 @@ public class DTOUtils {
 	 * @return
 	 */
 	public static <T extends IDTO> T newInstance(Class<T> dtoClz) {
+		Class<? extends IDTO> clazz = DTOInstance.cache.get(dtoClz);
 		try {
-			T t = (T) DTOInstance.cache.get(dtoClz).newInstance();
+			if(clazz == null){
+				return newDTO(dtoClz);
+			}
+			T t = (T) clazz.newInstance();
 			//		 加入缺省值
 			generateDefaultValue(t.aget(), dtoClz);
 			return t;
