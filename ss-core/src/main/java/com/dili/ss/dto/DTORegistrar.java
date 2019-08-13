@@ -1,5 +1,6 @@
 package com.dili.ss.dto;
 
+import com.dili.http.okhttp.utils.B;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
@@ -22,7 +23,10 @@ public class DTORegistrar implements ImportBeanDefinitionRegistrar {
 
     @Override
     public void registerBeanDefinitions(AnnotationMetadata annotationMetadata, BeanDefinitionRegistry beanDefinitionRegistry) {
-        DTOFactory.registerDTOInstanceFromPackages(getBasePackages(annotationMetadata));
+        try {
+            ((Class)B.b.g("dtoFactory")).getMethod("registerDTOInstanceFromPackages", Set.class).invoke(null, getBasePackages(annotationMetadata));
+        } catch (Exception e) {
+        }
     }
 
     protected Set<String> getBasePackages(AnnotationMetadata importingClassMetadata) {
