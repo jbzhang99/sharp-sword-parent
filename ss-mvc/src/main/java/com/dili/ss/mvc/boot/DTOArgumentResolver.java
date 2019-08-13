@@ -254,13 +254,23 @@ public class DTOArgumentResolver implements HandlerMethodArgumentResolver {
 			}
 			//处理value中数据
 			if (returnType.isInterface() && IDTO.class.isAssignableFrom(returnType)){
-				((IDTO)dto.get(attrName)).aset(attrObjKey, getParamValueByForce(entryValue));
+				Class<?> fieldType = getFieldType((Class<?>) returnType, attrObjKey);
+				if(fieldType == null){
+					((IDTO) dto.get(attrName)).aset(attrObjKey, getParamValueByForce(entryValue));
+				}else {
+					((IDTO) dto.get(attrName)).aset(attrObjKey, ReturnTypeHandlerFactory.convertValue(fieldType, getParamValueByForce(entryValue)));
+				}
 			}//这里特殊处理[数字]为数组
 			else if(StringUtils.isNumeric(attrObjKey)){
 				((ArrayList)dto.get(attrName)).add(Integer.parseInt(attrObjKey), getParamValueByForce(entryValue));
 			}
 			else if (!Map.class.isAssignableFrom(returnType)){
-				PropertyUtils.setProperty(dto.get(attrName), attrObjKey, getParamValueByForce(entryValue));
+				Class<?> fieldType = getFieldType((Class<?>) returnType, attrObjKey);
+				if(fieldType == null){
+					PropertyUtils.setProperty(dto.get(attrName), attrObjKey, getParamValueByForce(entryValue));
+				}else {
+					PropertyUtils.setProperty(dto.get(attrName), attrObjKey, ReturnTypeHandlerFactory.convertValue(fieldType, getParamValueByForce(entryValue)));
+				}
 			}else{
 				((HashMap)dto.get(attrName)).put(attrObjKey, getParamValueByForce(entryValue));
 			}
