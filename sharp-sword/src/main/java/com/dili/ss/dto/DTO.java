@@ -1,6 +1,5 @@
 package com.dili.ss.dto;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 
 import java.io.ByteArrayInputStream;
@@ -21,7 +20,7 @@ public class DTO extends HashMap<String, Object> {
 	private static final long serialVersionUID = -514229978937800587L;
 	// 附属信息
 	// 缺省情况下均没有,只有在有属性要求的情况下才创建
-	private Map<String, Object> metadata = new HashMap<>();
+	private Map<String, Object> metadata = new HashMap<>(4);
 
 	// 是否监听修改
 	private boolean listenModify;
@@ -144,7 +143,7 @@ public class DTO extends HashMap<String, Object> {
 	 *
 	 * @param key
 	 * @param value
-	 * @return
+	 * @return 返回put之前的原值
 	 */
 	public Object setMetadata(String key, Object value) {
 		if (metadata == null)
@@ -183,20 +182,20 @@ public class DTO extends HashMap<String, Object> {
 		return super.clone();
 	}
 
-//	private int hash; // Default to 0
-//	@Override
-//	public int hashCode() {
-//		int h = hash;
-//		String value = toString();
-//		if (h == 0 && value.length() > 0) {
-//			char val[] = value.toCharArray();
-//			for (int i = 0; i < value.length(); i++) {
-//				h = 31 * h + val[i];
-//			}
-//			hash = h;
-//		}
-//		return h;
-//	}
+	private int hash; // Default to 0
+	@Override
+	public int hashCode() {
+		int h = hash;
+		String value = toString();
+		if (h == 0 && value.length() > 0) {
+			char val[] = value.toCharArray();
+			for (int i = 0; i < value.length(); i++) {
+				h = 31 * h + val[i];
+			}
+			hash = h;
+		}
+		return h;
+	}
 
 	@Override
 	public String toString() {

@@ -301,7 +301,7 @@ public class RSAUtils {
         byte[] encryptByPublic = RSAUtils.encryptByPublicKey(content.getBytes(), publicBytes);
         System.out.println("===========甲方使用公钥对数据进行加密==============");
         System.out.println("加密后的数据：" + Base64.encodeBase64String(encryptByPublic));
-
+        //加密后的数据：pDm5Ge+2N16d7PbyeucjK7QYq7bWWqbZ7WiIv6706gLwuwyG088/AMTlloeDihSkQkP4sRyxS0ivY9UACNVVdg==
         System.out.println("===========甲方使用私钥对数据进行解密==============");
         //甲方使用私钥对数据进行解密
         byte[] decryptByPrivate = RSAUtils.decryptByPrivateKey(encryptByPublic, privateBytes);

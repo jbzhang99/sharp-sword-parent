@@ -1,5 +1,6 @@
 package com.dili.ss.dto;
 
+import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
 
@@ -7,13 +8,12 @@ import java.io.Reader;
 import java.math.BigDecimal;
 import java.sql.Clob;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 返回值类型转换工厂，用于解决DTOHandler过多的if判断
@@ -34,6 +34,8 @@ public class ReturnTypeHandlerFactory {
         cache.put(Clob.class, new ClobStrategy());
         cache.put(Instant.class, new InstantStrategy());
         cache.put(LocalDateTime.class, new LocalDateTimeStrategy());
+        cache.put(List.class, new ListStrategy());
+        cache.put(String.class, new StringStrategy());
     }
 
     /**
@@ -60,6 +62,34 @@ public class ReturnTypeHandlerFactory {
          * @return
          */
         Object convert(Object value);
+    }
+
+    /**
+     * String转换策略
+     */
+    private static class StringStrategy implements Strategy{
+
+        @Override
+        public Object convert(Object value) {
+            if(value instanceof String){
+                return (String)value;
+            }
+            return value == null ? null :String.valueOf(value);
+        }
+    }
+
+    /**
+     * List转换策略
+     */
+    private static class ListStrategy implements Strategy{
+
+        @Override
+        public Object convert(Object value) {
+            if(value instanceof List){
+                return value;
+            }
+            return Lists.newArrayList(value);
+        }
     }
 
     /**
@@ -146,7 +176,7 @@ public class ReturnTypeHandlerFactory {
 
         @Override
         public Object convert(Object value) {
-            return getClobString((java.sql.Clob)value);
+            return getClobString((Clob)value);
         }
     }
 
@@ -192,9 +222,13 @@ public class ReturnTypeHandlerFactory {
             // 如果当前字段的值不是日期型, 转换返回值，并且将新的返回值填入委托对象中
             if(String.class.equals(value.getClass())){
                 try {
-                    return StringUtils.isNumeric(value.toString()) ? new Date(Long.parseLong(value.toString())) : DateUtils.parseDate(value.toString(), "yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd");
+                    return StringUtils.isNumeric(value.toString()) ? new Date(Long.parseLong(value.toString())) : DateUtils.parseDate(value.toString(), "yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd", "E MMM dd yyyy HH:mm:ss");
                 } catch (ParseException e) {
-                    e.printStackTrace();
+                    try {
+                        return new SimpleDateFormat("EEE MMM dd yyyy HH:mm:ss", Locale.US).parse(value.toString());
+                    } catch (ParseException ex) {
+                        ex.printStackTrace();
+                    }
                 }
             } else if (Long.class.equals(value.getClass())) {
                 return new Date((Long)value);
@@ -203,7 +237,7 @@ public class ReturnTypeHandlerFactory {
         }
     }
 
-    private static String getClobString(java.sql.Clob c) {
+    private static String getClobString(Clob c) {
         try {
             Reader reader=c.getCharacterStream();
             if (reader == null) {

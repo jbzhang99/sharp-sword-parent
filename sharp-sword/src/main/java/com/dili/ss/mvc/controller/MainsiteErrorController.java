@@ -1,5 +1,6 @@
 package com.dili.ss.mvc.controller;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.dili.ss.domain.BaseOutput;
 import com.dili.ss.util.SpringUtil;
@@ -10,11 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.error.ErrorAttributes;
 import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.request.WebRequest;
 
 import javax.servlet.http.HttpServletRequest;
@@ -43,24 +41,35 @@ public class MainsiteErrorController implements ErrorController {
 	 * @param response
 	 * @return
 	 */
-	@RequestMapping(produces = {MediaType.APPLICATION_JSON_VALUE})
-	@ResponseBody
-//	public ResponseEntity<Map<String, Object>> ajaxError(HttpServletRequest request, HttpServletResponse response){
-	public ResponseEntity<Map<String, Object>> ajaxError(WebRequest request, HttpServletResponse response){
-		Map<String, Object> body = getErrorAttributes(request, true);
-		HttpStatus status = getStatus(request);
-		log.error(JSONObject.toJSONString(buildBody(request,true)));
-		return new ResponseEntity(body, status);
+//	@RequestMapping(produces = {MediaType.APPLICATION_JSON_VALUE})
+//	@ResponseBody
+	public String ajaxError(WebRequest request, HttpServletResponse response){
+//		Map<String, Object> body = getErrorAttributes(request, true);
+//		HttpStatus status = getStatus(request);
+		BaseOutput output = buildBody(request,true);
+		log.error(JSONObject.toJSONString(output));
+//		return new ResponseEntity(body, status);
+		return JSON.toJSONString(output);
 	}
 
-//	页面错误
+	/**
+	 * 页面错误
+	 * 在springboot项目中当我们访问一个不存在的url时调用
+	 * 但是其获取不到异常的具体信息，也无法根据异常类型进行不同的响应
+	 * 所有正常情况下是到@ControllerAdvice设置的异常拦截中
+	 * @ControllerAdvice报错或者页面找不到，也会进入这里
+	 * @param request
+	 * @param response
+	 * @return
+	 */
 	@RequestMapping(produces = "text/html")
 	public String handleError(HttpServletRequest request, HttpServletResponse response){
 		//获取statusCode:401,404,500
-//		Integer statusCode = (Integer) request.getAttribute("javax.servlet.error.status_code")
-//		if(statusCode == 401){
-//			return "/401"
-//		}else if(statusCode == 404){
+		Integer statusCode = (Integer) request.getAttribute("javax.servlet.error.status_code");
+		if(statusCode == 401){
+			return SpringUtil.getProperty("error.page.404", "error/noAccess");
+		}
+//		else if(statusCode == 404){
 //			return "/404"
 //		}else if(statusCode == 403){
 //			return "/403"
@@ -70,13 +79,16 @@ public class MainsiteErrorController implements ErrorController {
 		return SpringUtil.getProperty("error.page.404", "error/404");
 	}
 
-//	没有权限
+	//未登录
+	@RequestMapping("/noLogin.do")
+	public String noLogin(HttpServletRequest request, HttpServletResponse response){
+		return SpringUtil.getProperty("error.page.noLogin", "error/noLogin");
+	}
+
+//	页面没有权限
 	@RequestMapping("/noAccess.do")
 	public String noAccess(HttpServletRequest request, HttpServletResponse response){
-//		if ("XMLHttpRequest".equals(request.getHeader("X-Requested-With"))) {
-//		}else {
-			return SpringUtil.getProperty("error.page.404", "error/404");
-//		}
+		return SpringUtil.getProperty("error.page.noAccess", "error/noAccess");
 	}
 
 	@Override
@@ -85,7 +97,7 @@ public class MainsiteErrorController implements ErrorController {
 	}
 
 //	private Map<String, Object> getErrorAttributes(HttpServletRequest request, boolean includeStackTrace) {
-private Map<String, Object> getErrorAttributes(WebRequest request, boolean includeStackTrace) {
+	private Map<String, Object> getErrorAttributes(WebRequest request, boolean includeStackTrace) {
 //		RequestAttributes requestAttributes = new ServletRequestAttributes(request);
 		return errorAttributes.getErrorAttributes(request, includeStackTrace);
 	}

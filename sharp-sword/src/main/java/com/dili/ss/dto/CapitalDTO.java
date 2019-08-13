@@ -9,7 +9,7 @@ public class CapitalDTO extends DTO{
 	private static final long serialVersionUID = -688089562635699991L;
 
 	/**
-	 * @see java.util.HashMap#containsKey(java.lang.Object)
+	 * @see java.util.HashMap#containsKey(Object)
 	 */
 	@Override
 	public boolean containsKey(Object key) {
@@ -22,7 +22,7 @@ public class CapitalDTO extends DTO{
 	}
 
 	/**
-	 * @see java.util.HashMap#get(java.lang.Object)
+	 * @see java.util.HashMap#get(Object)
 	 */
 	@Override
 	public Object get(Object key) {

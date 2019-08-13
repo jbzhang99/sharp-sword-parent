@@ -4,7 +4,6 @@ import com.alibaba.fastjson.JSONObject;
 import com.dili.ss.metadata.FieldMeta;
 import com.dili.ss.metadata.MetadataUtils;
 import com.dili.ss.metadata.ObjectMeta;
-import com.dili.ss.util.BeanConver;
 import org.apache.commons.lang3.StringUtils;
 import org.beetl.core.Tag;
 import org.springframework.stereotype.Component;
@@ -62,7 +61,17 @@ public class FieldMetaTag extends Tag {
 	 */
 	public static String getVarName(String clazzFullName){
 		Assert.hasText(clazzFullName, "clazzFullName不能为空");
-		return BeanConver.lowerCaseFirstChar(clazzFullName.substring(clazzFullName.lastIndexOf(".")+1))+"Meta";
+		return lowerCaseFirstChar(clazzFullName.substring(clazzFullName.lastIndexOf(".")+1))+"Meta";
+	}
+
+	/**
+	 * 第一个字符小写
+	 *
+	 * @param value
+	 * @return
+	 */
+	private static String lowerCaseFirstChar(String value){
+		return String.valueOf(value.charAt(0)).toLowerCase() + value.substring(1);
 	}
 
 

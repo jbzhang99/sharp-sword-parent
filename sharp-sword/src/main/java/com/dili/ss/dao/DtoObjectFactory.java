@@ -4,7 +4,6 @@ import com.dili.ss.dto.DTOUtils;
 import com.dili.ss.dto.IDTO;
 import org.apache.ibatis.reflection.factory.DefaultObjectFactory;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Properties;
 
@@ -23,7 +22,7 @@ public class DtoObjectFactory extends DefaultObjectFactory {
 	//处理有参构造方法
 	@Override
 	public <T> T create(Class<T> type, List<Class<?>> constructorArgTypes,
-	                    List<Object> constructorArgs) {
+						List<Object> constructorArgs) {
 		return super.create(type, constructorArgTypes, constructorArgs);
 	}
 
@@ -31,7 +30,7 @@ public class DtoObjectFactory extends DefaultObjectFactory {
 	@Override
 	public <T> T create(Class<T> type) {
 		if(type.isInterface() && IDTO.class.isAssignableFrom(type)){
-			return (T) DTOUtils.newDTO((Class<IDTO>)type);
+			return (T) DTOUtils.newInstance((Class<IDTO>)type);
 		}else {
 			return super.create(type);
 		}
@@ -41,11 +40,6 @@ public class DtoObjectFactory extends DefaultObjectFactory {
 	public void setProperties(Properties properties) {
 		this.properties = properties;
 		super.setProperties(properties);
-	}
-
-	@Override
-	public <T> boolean isCollection(Class<T> type) {
-		return Collection.class.isAssignableFrom(type);
 	}
 
 }

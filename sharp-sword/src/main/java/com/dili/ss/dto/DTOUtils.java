@@ -2,6 +2,7 @@ package com.dili.ss.dto;
 
 import com.dili.ss.domain.BaseDomain;
 import com.dili.ss.exception.InternalException;
+import com.dili.ss.exception.ParamErrorException;
 import com.dili.ss.metadata.FieldMeta;
 import com.dili.ss.metadata.MetadataUtils;
 import com.dili.ss.metadata.ObjectMeta;
@@ -22,14 +23,11 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.text.MessageFormat;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * DTOData的工具类
- *
+ * 处理DTO和Instance相关的逻辑
  * @author WangMi
  * @create 2017-7-31
  */
@@ -43,16 +41,6 @@ public class DTOUtils {
 	private static final String TRANS_PROXY_ERROR = "转换DTO的代理对象出错！";
 	// 错误消息
 	private static final String TO_ENTITY_ERROR = "类为{0}的DTO对象转实体{1}出错!";
-	/**
-	 * 判断object是否DTO的一个代理对象
-	 *
-	 * @param object
-	 * @return
-	 */
-	public static boolean isDTOProxy(Object object) {
-		assert (object != null);
-		return internalIsProxy(object, DTOHandler.class);
-	}
 
 
 	/**
@@ -62,28 +50,36 @@ public class DTOUtils {
 	 * @return 如果不是DTO对象实例或其代理对象，则返回null;
 	 */
 	public static DTO go(Object obj) {
-		if (obj == null)
+		if (obj == null) {
 			return null;
-		else if (obj instanceof DTO)
+		} else if (obj instanceof DTO) {
 			return (DTO) obj;
-		else if (isProxy(obj)) {
+		} else if (isProxy(obj)) {
 			DTOHandler handler = (DTOHandler) Proxy.getInvocationHandler(obj);
 			return handler.getDelegate();
-		}
+		}else if(obj.getClass().getName().endsWith(DTOInstance.SUFFIX)){
+            try {
+                DTO dto = (DTO)obj.getClass().getMethod("aget").invoke(obj);
+                dto.putAll(BeanConver.transformObjectToMap(obj));
+                return dto;
+            } catch (Exception e) {
+                // dont care
+            }
+        }
 		return null;
 	}
 
 	/**
-	 * 获取代理对象
+	 * 获取代理对象，支持默认方法
 	 * @param obj
 	 * @return
 	 */
 	public static DTO goByDef(Object obj) throws Throwable {
-		if (obj == null)
+		if (obj == null) {
 			return null;
-		else if (obj instanceof DTO)
+		} else if (obj instanceof DTO) {
 			return (DTO) obj;
-		else if (isProxy(obj)) {
+		} else if (isProxy(obj)) {
 			DTOHandler handler = (DTOHandler) Proxy.getInvocationHandler(obj);
 			DTO dto = handler.getDelegate();
 			Class<?> clazz = handler.getProxyClazz();
@@ -95,29 +91,22 @@ public class DTOUtils {
 				}
 			}
 			return dto;
+		}else if(obj.getClass().getName().endsWith(DTOInstance.SUFFIX)){
+			try {
+				DTO dto = (DTO)obj.getClass().getMethod("aget").invoke(obj);
+				dto.putAll(BeanConver.transformObjectToMap(obj));
+				return dto;
+			} catch (Exception e) {
+				// dont care
+			}
 		}
 		return null;
 	}
 
 	/**
-	 * 转成其它任意的IDTO接口的对象
-	 *
-	 * @param <T>
-	 * @param source 源DTO接口
-	 * @param proxyClazz 目标DTO类型
-	 * @return
-	 */
-	public static <T extends IDTO> T cast(IDTO source, Class<T> proxyClazz) {
-		assert (source != null);
-		assert (proxyClazz != null);
-		return proxy((DTOHandler) Proxy.getInvocationHandler(source),
-				proxyClazz);
-	}
-
-	/**
-	 * 深克隆
-	 * @param obj
-	 * @param proxyClazz
+	 * 深克隆DTO接口或实例为DTO接口
+	 * @param obj DTO接口或实例
+	 * @param proxyClazz DTO接口类
 	 * @param <T>
 	 * @return
 	 */
@@ -131,9 +120,10 @@ public class DTOUtils {
 	}
 
 	/**
-	 * 取DTO的实际类<br>
+	 * 取DTO、实例或javaBean的实际类<br>
 	 * <li>是代理对象时,则返回其代理接口</li>
-	 * <li>是实际的DTO子类的实例时,则返回子类的类名</li>
+	 * <li>是实际的DTO的实例时,则返回接口类名</li>
+	 * <li>是JavaBean时，返回类名</li>
 	 *
 	 * @param dto dto接口
 	 * @return
@@ -151,9 +141,20 @@ public class DTOUtils {
 			} else {
 				throw new InternalException("当前代理对象不是DTOHandler能处理的对象!");
 			}
-		} else {
+		} else if(isInstance(dto)){
+			return dto.getClass().getInterfaces()[0];
+		} else{
 			return dto.getClass();
 		}
+	}
+
+	/**
+	 * 根据接口类，获取Instance类
+	 * @param proxyClz
+	 * @return
+	 */
+	public  final static Class<?> getInstanceClass(Class<? extends IDTO> proxyClz) {
+		return DTOInstance.cache.get(proxyClz);
 	}
 
 	/**
@@ -210,20 +211,57 @@ public class DTOUtils {
 	 * @return proxyClz不是接口或者没有父接口，有可能出DTOProxyException异常
 	 */
 	public static <T extends IDTO> T proxy(DTO realObj, Class<T> proxyClz) {
-		assert (realObj != null);
-		assert (proxyClz != null);
-		T dto = internalProxy(realObj, proxyClz, DTOHandler.class);
-		dto.mset(realObj.getMetadata());
-		return dto;
+		return internalProxy(realObj, proxyClz, DTOHandler.class);
+	}
+
+	/**
+	 * 将DTO对象的实例转成代理的目标接口或对象
+	 *
+	 * @param realObj
+	 *          DTO对象实例
+	 * @param <T>
+	 *          结果类
+	 * @return proxyClz不是接口或者没有父接口，有可能出DTOProxyException异常
+	 */
+	public static <T extends IDTO> T proxyInstance(DTO realObj, Class<T> proxyClz) {
+		T retval = null;
+		// 如果是接口方式,则直接根据接口来创建
+		if (proxyClz.isInterface()) {
+			retval = newInstance(proxyClz);
+			retval.aset(realObj);
+		}else{
+			throw new ParamErrorException("proxyClz参数必须是实现IDTO的接口类");
+		}
+//		 加入缺省值
+		generateDefaultValue(realObj, proxyClz);
+		return retval;
 	}
 
 	/**
 	 * 根据proxyClz new 一个DTO对象
-	 * @param proxyClz <T extends IDTO>接口
+	 * @param dtoClz <T extends IDTO>接口
 	 * @return
 	 */
-	public static <T extends IDTO> T newDTO(Class<T> proxyClz) {
-		return proxy(new DTO(), proxyClz);
+	public static <T extends IDTO> T newDTO(Class<T> dtoClz) {
+		return proxy(new DTO(), dtoClz);
+	}
+
+	/**
+	 * 根据创建DTO实例对象
+	 * @param dtoClz <T extends IDTO>接口
+	 * @return
+	 */
+	public static <T extends IDTO> T newInstance(Class<T> dtoClz) {
+		try {
+			T t = (T) DTOInstance.cache.get(dtoClz).newInstance();
+			//		 加入缺省值
+			generateDefaultValue(t.aget(), dtoClz);
+			return t;
+		} catch (InstantiationException e) {
+			return newDTO(dtoClz);
+		} catch (IllegalAccessException e) {
+			return newDTO(dtoClz);
+		}
 	}
 
 	/**
@@ -239,12 +277,48 @@ public class DTOUtils {
 	public static <T extends IDTO> List<T> as(List sources, Class<T> proxyClz) {
 		assert (sources != null);
 		assert (proxyClz != null);
-
 		List<T> list = new ArrayList<T>(sources.size());
 		for (Object source : sources) {
-			list.add(internalAs(source, proxyClz, DTOHandler.class));
+			list.add(internalAs(source, proxyClz));
 		}
 		return list;
+	}
+
+	/**
+	 * 将一个实体、DTO实例或DTO的代理类列表，重新转成另外一个DTO实例对象列表
+	 *
+	 * @param <T>
+	 * @param sources
+	 *          DTO、DTO接口或实体的List
+	 * @param proxyClz<T extends IDTO>
+	 *          要转成的目标代理类
+	 * @return 有可能出DTOProxyException异常
+	 */
+	public static <T extends IDTO> List<T> asInstance(List sources, Class<T> proxyClz) {
+		assert (sources != null);
+		assert (proxyClz != null);
+		List<T> list = new ArrayList<T>(sources.size());
+		for (Object source : sources) {
+			list.add(internalAsInstance(source, proxyClz));
+		}
+		return list;
+	}
+
+	/**
+	 * 将一个实体、DTO实例或DTO的代理类，重新转成另外一个DTO代理对象
+	 *
+	 * @param <T>
+	 * @param source
+	 *          已被代理的DTO对象
+	 * @param proxyClz
+	 *          要转成的目标代理类
+	 * @return 有可能出DTOProxyException异常
+	 */
+	@SuppressWarnings("unchecked")
+	public static <T extends IDTO> T as(Object source, Class<T> proxyClz) {
+		assert (source != null);
+		assert (proxyClz != null);
+		return internalAs(source, proxyClz);
 	}
 
 	/**
@@ -258,10 +332,29 @@ public class DTOUtils {
 	 * @return 有可能出DTOProxyException异常
 	 */
 	@SuppressWarnings("unchecked")
-	public static <T extends IDTO> T as(Object source, Class<T> proxyClz) {
+	public static <T extends IDTO> T asInstance(Object source, Class<T> proxyClz) {
 		assert (source != null);
 		assert (proxyClz != null);
-		return internalAs(source, proxyClz, DTOHandler.class);
+		return internalAsInstance(source, proxyClz);
+	}
+
+
+	/**
+	 * 实例类转换
+	 * * 支持DTOInstance和javaBean转为DTOInstance
+	 * * Instance须已初始化
+	 * @param source 源对象    不支持DTO
+	 * @param target 目标对象   DTOInstance的接口类
+	 * @param <T> 源对象
+	 * @param <K> 目标对象
+	 */
+	public static<T extends IDTO,K extends IDTO> K bean2Instance(T source, Class<K> target ){
+		if (source == null) {
+			return null;
+		}
+		K result = (K)DTOUtils.newInstance(target);
+		org.springframework.beans.BeanUtils.copyProperties(source, result);
+		return result;
 	}
 
 	/**
@@ -293,7 +386,9 @@ public class DTOUtils {
 	 * @return
 	 */
 	public static <T extends IDTO> T switchEntityToDTO(BaseDomain source, Class<T> proxyClz) {
-		if(source==null||proxyClz==null) return null;
+		if(source==null||proxyClz==null) {
+			return null;
+		}
 		T temp = DTOUtils.newDTO(proxyClz);
 		try {
 			org.springframework.beans.BeanUtils.copyProperties(source, temp);
@@ -314,8 +409,9 @@ public class DTOUtils {
 	public static <T extends IDTO> List<T> proxy(List<? extends DTO> realList, Class<T> proxyClz) {
 		assert (proxyClz != null);
 		// 如果列表为空，则返回一个空的
-		if (realList == null)
+		if (realList == null) {
 			return Collections.EMPTY_LIST;
+		}
 
 		// 进行处理
 		return new DTOList<T>(proxyClz, realList);
@@ -331,7 +427,7 @@ public class DTOUtils {
 	 * @return
 	 */
 	public static boolean isInstance(Object object) {
-		return object instanceof DTO || internalIsProxy(object, DTOHandler.class);
+		return object.getClass().getName().endsWith(DTOInstance.SUFFIX);
 	}
 
 	/**
@@ -377,7 +473,9 @@ public class DTOUtils {
 		for(FieldMeta fm : om){
 			if(String.class.isAssignableFrom(fm.getType())){
 				DTO dd = DTOUtils.go(dto);
-				if(dd == null || dd.isEmpty()) return;
+				if(dd == null || dd.isEmpty()) {
+					return;
+				}
 				if(dd.get(fm.getName()) != null) {
 					dd.put(fm.getName(), new String(dd.get(fm.getName()).toString().getBytes("ISO8859-1"), "UTF-8"));
 				}
@@ -386,7 +484,7 @@ public class DTOUtils {
 	}
 
 	/**
-	 * 将两个DTO连接起来<br>
+	 * 将两个DTO接口连接起来<br>
 	 * 要求两个DTO的字段没有重复的,有重复的则以master为准
 	 *
 	 * @param <T>
@@ -396,8 +494,9 @@ public class DTOUtils {
 	 * @return
 	 */
 	public static <T extends IDTO> T link(T master, IDTO second, Class<T> masterClazz) {
-		if (second == null)
+		if (second == null) {
 			return master;
+		}
 		if (master == null) {
 			return as(second, masterClazz);
 		}
@@ -416,7 +515,7 @@ public class DTOUtils {
 	 * @return
 	 */
 	final static Object getProperty(Object object, String name) {
-		if(isDTOProxy(object)){
+		if(isProxy(object)){
 			return POJOUtils.getProperty(go(object), name);
 		}
 		return POJOUtils.getProperty(object, name);
@@ -430,7 +529,7 @@ public class DTOUtils {
 	 * @return
 	 */
 	final static Object setProperty(Object object, String name,
-									Object value) {
+	                                Object value) {
 		POJOUtils.setProperty(object, name, value);
 		return object;
 	}
@@ -447,11 +546,7 @@ public class DTOUtils {
 	 */
 	@SuppressWarnings("unchecked")
 	final static <T extends IDTO> T internalProxy(DTO realObj,
-												  Class<T> proxyClz, Class<? extends DTOHandler> handlerClazz) {
-		assert (handlerClazz != null);
-		assert (realObj != null);
-		assert (proxyClz != null);
-
+	                                              Class<T> proxyClz, Class<? extends DTOHandler> handlerClazz) {
 		T retval = null;
 		// 如果是接口方式,则直接根据接口来创建
 		if (proxyClz.isInterface()) {
@@ -472,7 +567,7 @@ public class DTOUtils {
 				throw new DTOProxyException(message);
 			}
 		}
-		// 加入缺省值
+//		 加入缺省值
 		generateDefaultValue(realObj, proxyClz);
 		return retval;
 	}
@@ -489,16 +584,15 @@ public class DTOUtils {
 	 */
 	@SuppressWarnings("unchecked")
 	final static <T extends IDTO> T internalAs(Object source,
-											   Class<T> proxyClz, Class<? extends DTOHandler> handlerClazz) {
-		assert (handlerClazz != null);
+	                                           Class<T> proxyClz) {
 		assert (source != null);
 		assert (proxyClz != null);
 
 		if (source instanceof DTO) {
-			return internalProxy((DTO) source, proxyClz, handlerClazz);
+			return internalProxy((DTO) source, proxyClz, DTOHandler.class);
 		} else if (source.getClass().isAssignableFrom(proxyClz)) {
 			return (T) source;
-		} else if (internalIsProxy(source, handlerClazz)) {
+		} else if (internalIsProxy(source, DTOHandler.class)) {
 			try {
 				DTOHandler handler = (DTOHandler) Proxy
 						.getInvocationHandler(source);
@@ -508,7 +602,7 @@ public class DTOUtils {
 				throw new DTOProxyException(TRANS_PROXY_ERROR);
 			}
 		} else if( source instanceof BaseDomain){
-			switchEntityToDTO((BaseDomain)source, proxyClz);
+			return switchEntityToDTO((BaseDomain)source, proxyClz);
 		} else {
 			DTO dto = new DTO();
 			Method[] methods = source.getClass().getMethods();
@@ -525,6 +619,78 @@ public class DTOUtils {
 
 				}
 			}
+			return proxy(dto, proxyClz);
+		}
+//		logger.warn(INVALID_DELEGATE_ERROR);
+//		throw new DTOProxyException(INVALID_DELEGATE_ERROR);
+	}
+
+	/**
+	 * 将一个DTO实例或DTO的代理类，重新转成另外一个实例代理对象
+	 *
+	 * @param <T>
+	 * @param source
+	 *            已被代理的DTO对象
+	 * @param proxyClz
+	 *            要转成的目标代理类
+	 * @return 有可能出异常
+	 */
+	@SuppressWarnings("unchecked")
+	final static <T extends IDTO> T internalAsInstance(Object source,
+											   Class<T> proxyClz) {
+		assert (source != null);
+		assert (proxyClz != null);
+
+		if (source instanceof DTO) {
+			T instance = DTOUtils.newInstance(proxyClz);
+			try {
+				IDTO.class.getMethod("aset", DTO.class).invoke(instance, source);
+			} catch (Exception e) {
+				//don't care
+			}
+			return instance;
+		} else if (source.getClass().isAssignableFrom(proxyClz)) {
+			return (T) source;
+		} else if (internalIsProxy(source, DTOHandler.class)) {
+			DTOHandler handler = (DTOHandler) Proxy
+					.getInvocationHandler(source);
+			Object instance = bean2Instance((IDTO)source, proxyClz);
+			try {
+				IDTO.class.getMethod("aset", DTO.class).invoke(instance, handler.getDelegate());
+			} catch (Exception e) {
+				//don't care
+			}
+			return (T)instance;
+		} else if( source instanceof BaseDomain){
+//			return switchEntityToDTO((BaseDomain)source, proxyClz);
+			return bean2Instance((IDTO)source, proxyClz);
+		} else if( source instanceof Map) {
+			T instance = DTOUtils.newInstance(proxyClz);
+			Map map = (Map)source;
+			Method[] methods = proxyClz.getMethods();
+			DTO dto = new DTO();
+			dto.putAll(map);
+			try {
+				instance.getClass().getMethod("aset", DTO.class).invoke(instance, dto);
+			} catch (Exception e) {
+				//don't care
+			}
+			for(Method method : methods){
+				//set方法，且参数数量为1
+				if(POJOUtils.isSetMethod(method) && method.getParameters().length == 1){
+					String fieldName = POJOUtils.getBeanField(method);
+					try {
+						if(map.containsKey(fieldName)) {
+							method.invoke(instance, map.get(fieldName));
+						}
+					} catch (Exception ex) {
+						logger.warn(TRANS_PROXY_ERROR);
+						throw new DTOProxyException(TRANS_PROXY_ERROR);
+					}
+				}
+
+			}
+			return instance;
 		}
 		logger.warn(INVALID_DELEGATE_ERROR);
 		throw new DTOProxyException(INVALID_DELEGATE_ERROR);
@@ -538,7 +704,7 @@ public class DTOUtils {
 	 */
 	@SuppressWarnings("unchecked")
 	final static boolean internalIsProxy(Object object,
-										 Class<? extends DTOHandler> handlerClazz) {
+	                                     Class<? extends DTOHandler> handlerClazz) {
 		assert (object != null);
 		assert (handlerClazz != null);
 		// 如果是代理类，则检查代理处理器是否为DTOHandler,此处认为所有的DTO的代理处理器都是DTOHandler
@@ -564,7 +730,7 @@ public class DTOUtils {
 	 */
 	@SuppressWarnings("unchecked")
 	final static <T extends IDTO> T proxy(DTOHandler handler,
-										  Class<T> proxyClz) {
+	                                      Class<T> proxyClz) {
 		T retval = null;
 		// 是接口
 		if (proxyClz.isInterface()) {
@@ -628,9 +794,9 @@ public class DTOUtils {
 		ObjectMeta objectMeta = MetadataUtils.getDTOMeta(proxyClz);
 		for (FieldMeta fieldMeta : objectMeta) {
 			// 如果在DTO中已经有值，就不管了
-			if (dtoData.containsKey(fieldMeta.getName()))
+			if (dtoData.containsKey(fieldMeta.getName())) {
 				continue;
-
+			}
 			// 检查是否有缺省值
 			String defStr = fieldMeta.getDefValue();
 			Class<?> type = fieldMeta.getType();

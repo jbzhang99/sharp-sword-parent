@@ -53,7 +53,7 @@ public class ExcelUtils {
         }
     }
 
-    public static void main(String[] args) throws Exception {
+    public static void main1(String[] args) throws Exception {
         // 同时支持Excel 2003、2007
         File excelFile = new File("d:/CRM.xlsx"); // 创建文件对象
         checkExcelVaild(excelFile);

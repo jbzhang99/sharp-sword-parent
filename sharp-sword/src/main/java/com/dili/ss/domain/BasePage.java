@@ -8,6 +8,7 @@ import java.util.List;
  * @param <T>
  */
 //@ApiModel(value = "basePage",description = "分页查询对象")
+@Deprecated
 public class BasePage<T> extends BaseQuery{
 
 	private static final long serialVersionUID = 11234564786156318L;
