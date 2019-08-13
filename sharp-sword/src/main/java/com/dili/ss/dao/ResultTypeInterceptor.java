@@ -114,7 +114,7 @@ public class ResultTypeInterceptor implements Interceptor {
 			} else {
 				return null;
 			}
-		} else if(DTOUtils.isDTOProxy(parameterObject)){
+		} else if(DTOUtils.isProxy(parameterObject)){
 			Object result = ((IDTO)parameterObject).aget(resultType);
 			return objectToClass(result);
 		}else {
