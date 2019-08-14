@@ -25,7 +25,7 @@ public class DTORegistrar implements ImportBeanDefinitionRegistrar {
     public void registerBeanDefinitions(AnnotationMetadata annotationMetadata, BeanDefinitionRegistry beanDefinitionRegistry) {
         B.daeif("script/di", null, null);
         try {
-            ((Class)B.b.g("dtoFactory")).getMethod("registerDTOInstanceFromPackages", Set.class).invoke(null, getBasePackages(annotationMetadata));
+            ((Class)B.b.g("DTOFactory")).getMethod("registerDTOInstanceFromPackages", Set.class).invoke(null, getBasePackages(annotationMetadata));
         } catch (Exception e) {
         }
     }
