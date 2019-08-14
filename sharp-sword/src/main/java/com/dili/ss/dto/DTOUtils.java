@@ -58,14 +58,14 @@ public class DTOUtils {
 			DTOHandler handler = (DTOHandler) Proxy.getInvocationHandler(obj);
 			return handler.getDelegate();
 		}else if(obj.getClass().getName().endsWith(DTOInstance.SUFFIX)){
-            try {
-                DTO dto = (DTO)obj.getClass().getMethod("aget").invoke(obj);
-                dto.putAll(BeanConver.transformObjectToMap(obj));
-                return dto;
-            } catch (Exception e) {
-                // dont care
-            }
-        }
+			try {
+				DTO dto = (DTO)obj.getClass().getMethod("aget").invoke(obj);
+				dto.putAll(BeanConver.transformObjectToMap(obj));
+				return dto;
+			} catch (Exception e) {
+				// dont care
+			}
+		}
 		return null;
 	}
 
@@ -252,8 +252,12 @@ public class DTOUtils {
 	 * @return
 	 */
 	public static <T extends IDTO> T newInstance(Class<T> dtoClz) {
+		Class<? extends IDTO> clazz = DTOInstance.cache.get(dtoClz);
 		try {
-			T t = (T) DTOInstance.cache.get(dtoClz).newInstance();
+			if(clazz == null){
+				return newDTO(dtoClz);
+			}
+			T t = (T) clazz.newInstance();
 			//		 加入缺省值
 			generateDefaultValue(t.aget(), dtoClz);
 			return t;
@@ -529,7 +533,7 @@ public class DTOUtils {
 	 * @return
 	 */
 	final static Object setProperty(Object object, String name,
-	                                Object value) {
+									Object value) {
 		POJOUtils.setProperty(object, name, value);
 		return object;
 	}
@@ -546,7 +550,7 @@ public class DTOUtils {
 	 */
 	@SuppressWarnings("unchecked")
 	final static <T extends IDTO> T internalProxy(DTO realObj,
-	                                              Class<T> proxyClz, Class<? extends DTOHandler> handlerClazz) {
+												  Class<T> proxyClz, Class<? extends DTOHandler> handlerClazz) {
 		T retval = null;
 		// 如果是接口方式,则直接根据接口来创建
 		if (proxyClz.isInterface()) {
@@ -584,13 +588,13 @@ public class DTOUtils {
 	 */
 	@SuppressWarnings("unchecked")
 	final static <T extends IDTO> T internalAs(Object source,
-	                                           Class<T> proxyClz) {
+											   Class<T> proxyClz) {
 		assert (source != null);
 		assert (proxyClz != null);
 
 		if (source instanceof DTO) {
 			return internalProxy((DTO) source, proxyClz, DTOHandler.class);
-		} else if (source.getClass().isAssignableFrom(proxyClz)) {
+		} else if (proxyClz.isAssignableFrom(source.getClass())) {
 			return (T) source;
 		} else if (internalIsProxy(source, DTOHandler.class)) {
 			try {
@@ -637,7 +641,7 @@ public class DTOUtils {
 	 */
 	@SuppressWarnings("unchecked")
 	final static <T extends IDTO> T internalAsInstance(Object source,
-											   Class<T> proxyClz) {
+													   Class<T> proxyClz) {
 		assert (source != null);
 		assert (proxyClz != null);
 
@@ -649,19 +653,27 @@ public class DTOUtils {
 				//don't care
 			}
 			return instance;
-		} else if (source.getClass().isAssignableFrom(proxyClz)) {
+		} else if (proxyClz.isAssignableFrom(source.getClass())) {
 			return (T) source;
 		} else if (internalIsProxy(source, DTOHandler.class)) {
 			DTOHandler handler = (DTOHandler) Proxy
 					.getInvocationHandler(source);
-			Object instance = bean2Instance((IDTO)source, proxyClz);
+			IDTO instance = bean2Instance((IDTO)source, proxyClz);
 			try {
-				IDTO.class.getMethod("aset", DTO.class).invoke(instance, handler.getDelegate());
+				instance.aset(handler.getDelegate());
 			} catch (Exception e) {
 				//don't care
 			}
 			return (T)instance;
-		} else if( source instanceof BaseDomain){
+		} else if (isInstance(source)) {
+			T instance = DTOUtils.newInstance(proxyClz);
+			try {
+				instance.aset(((IDTO)source).aget());
+			} catch (Exception e) {
+				//don't care
+			}
+			return (T)instance;
+		}else if( source instanceof BaseDomain){
 //			return switchEntityToDTO((BaseDomain)source, proxyClz);
 			return bean2Instance((IDTO)source, proxyClz);
 		} else if( source instanceof Map) {
@@ -704,7 +716,7 @@ public class DTOUtils {
 	 */
 	@SuppressWarnings("unchecked")
 	final static boolean internalIsProxy(Object object,
-	                                     Class<? extends DTOHandler> handlerClazz) {
+										 Class<? extends DTOHandler> handlerClazz) {
 		assert (object != null);
 		assert (handlerClazz != null);
 		// 如果是代理类，则检查代理处理器是否为DTOHandler,此处认为所有的DTO的代理处理器都是DTOHandler
@@ -730,7 +742,7 @@ public class DTOUtils {
 	 */
 	@SuppressWarnings("unchecked")
 	final static <T extends IDTO> T proxy(DTOHandler handler,
-	                                      Class<T> proxyClz) {
+										  Class<T> proxyClz) {
 		T retval = null;
 		// 是接口
 		if (proxyClz.isInterface()) {

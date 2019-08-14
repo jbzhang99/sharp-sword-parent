@@ -594,7 +594,7 @@ public class DTOUtils {
 
 		if (source instanceof DTO) {
 			return internalProxy((DTO) source, proxyClz, DTOHandler.class);
-		} else if (source.getClass().isAssignableFrom(proxyClz)) {
+		} else if (proxyClz.isAssignableFrom(source.getClass())) {
 			return (T) source;
 		} else if (internalIsProxy(source, DTOHandler.class)) {
 			try {
@@ -653,19 +653,27 @@ public class DTOUtils {
 				//don't care
 			}
 			return instance;
-		} else if (source.getClass().isAssignableFrom(proxyClz)) {
+		} else if (proxyClz.isAssignableFrom(source.getClass())) {
 			return (T) source;
 		} else if (internalIsProxy(source, DTOHandler.class)) {
 			DTOHandler handler = (DTOHandler) Proxy
 					.getInvocationHandler(source);
-			Object instance = bean2Instance((IDTO)source, proxyClz);
+			IDTO instance = bean2Instance((IDTO)source, proxyClz);
 			try {
-				IDTO.class.getMethod("aset", DTO.class).invoke(instance, handler.getDelegate());
+				instance.aset(handler.getDelegate());
 			} catch (Exception e) {
 				//don't care
 			}
 			return (T)instance;
-		} else if( source instanceof BaseDomain){
+		} else if (isInstance(source)) {
+			T instance = DTOUtils.newInstance(proxyClz);
+			try {
+				instance.aset(((IDTO)source).aget());
+			} catch (Exception e) {
+				//don't care
+			}
+			return (T)instance;
+		}else if( source instanceof BaseDomain){
 //			return switchEntityToDTO((BaseDomain)source, proxyClz);
 			return bean2Instance((IDTO)source, proxyClz);
 		} else if( source instanceof Map) {
