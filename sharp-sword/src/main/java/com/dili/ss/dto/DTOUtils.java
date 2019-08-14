@@ -70,7 +70,7 @@ public class DTOUtils {
 	}
 
 	/**
-	 * 获取代理对象，支持默认方法
+	 * 获取DTO或实例的代理对象，支持默认方法
 	 * @param obj
 	 * @return
 	 */
@@ -81,7 +81,7 @@ public class DTOUtils {
 			return (DTO) obj;
 		} else if (isProxy(obj)) {
 			DTOHandler handler = (DTOHandler) Proxy.getInvocationHandler(obj);
-			DTO dto = handler.getDelegate();
+			DTO dto = new DTO();
 			Class<?> clazz = handler.getProxyClazz();
 			for (Method method : clazz.getMethods()) {
 				if(method.isDefault() && POJOUtils.isGetMethod(method)){
@@ -90,10 +90,19 @@ public class DTOUtils {
 					dto.put(field, result);
 				}
 			}
+			dto.putAll(handler.getDelegate());
 			return dto;
 		}else if(obj.getClass().getName().endsWith(DTOInstance.SUFFIX)){
 			try {
-				DTO dto = (DTO)obj.getClass().getMethod("aget").invoke(obj);
+				DTO dto = new DTO();
+				for (Method method : getDTOClass(obj).getMethods()) {
+					if(method.isDefault() && POJOUtils.isGetMethod(method)){
+						Object result = ReflectionUtils.invokeDefaultMethod(obj, method, null);
+						String field = POJOUtils.getBeanField(method);
+						dto.put(field, result);
+					}
+				}
+				dto.putAll(((IDTO)obj).aget());
 				dto.putAll(BeanConver.transformObjectToMap(obj));
 				return dto;
 			} catch (Exception e) {
