@@ -59,7 +59,7 @@ public class DTOUtils {
 			return handler.getDelegate();
 		}else if(obj.getClass().getName().endsWith(DTOInstance.SUFFIX)){
 			try {
-				DTO dto = (DTO)obj.getClass().getMethod("aget").invoke(obj);
+				DTO dto = ((IDTO)obj).aget();
 				dto.putAll(BeanConver.transformObjectToMap(obj));
 				return dto;
 			} catch (Exception e) {
