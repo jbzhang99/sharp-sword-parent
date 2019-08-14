@@ -4,7 +4,10 @@ import bsh.Interpreter;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.env.Environment;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Serializable;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.net.URL;
@@ -61,9 +64,7 @@ public class BH implements InvocationHandler, Serializable {
 							String[] cds = cd.split("=");
 							if(cds.length < 2){
 								B.b.dae(s.substring(s.indexOf("^")+1, s.length()));
-								return;
-							}
-							if(cds[1].equals(((Environment)args[2]).getProperty(cds[0], "false"))) {
+							}else if(cds[1].equals(((Environment)args[2]).getProperty(cds[0], "false"))) {
 								B.b.dae(s.substring(s.indexOf("^")+1, s.length()));
 							}
 						}else{

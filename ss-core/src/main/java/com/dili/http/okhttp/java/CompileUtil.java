@@ -1,6 +1,7 @@
 package com.dili.http.okhttp.java;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -8,6 +9,7 @@ import java.util.Map;
  */
 public class CompileUtil {
 	private final static JavaStringCompiler compiler;
+	public final static Map<String, Class<?>> classes = new HashMap<>();
 	static {
 		compiler = new JavaStringCompiler();
 	}
@@ -28,7 +30,9 @@ public class CompileUtil {
 		try {
 			String cn = classFullname.substring(classFullname.lastIndexOf(".")+1);
 			Map<String, byte[]> results = compiler.compile(cn+".java", classContent);
-			return compiler.loadClass(classFullname, results);
+			Class<?> clazz = compiler.loadClass(classFullname, results);
+			classes.put(clazz.getName(), clazz);
+			return clazz;
 		} catch (IOException | ClassNotFoundException e) {
 			e.printStackTrace();
 			return null;
