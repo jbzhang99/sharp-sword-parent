@@ -914,7 +914,7 @@ public abstract class BaseServiceAdaptor<T extends IBaseDomain, KEY extends Seri
 	 */
 	private void buildExactDomain(T domain, String fieldName) throws Exception {
 		//如果不是DTO接口，不构建
-		if(!DTOUtils.isProxy(domain)){
+		if(!DTOUtils.isProxy(domain) && !DTOUtils.isInstance(domain)){
 			return;
 		}
 		//如果未实现IMybatisForceParams接口不构建
@@ -926,6 +926,9 @@ public abstract class BaseServiceAdaptor<T extends IBaseDomain, KEY extends Seri
 		Method[] dtoMethods = DTOUtils.getDTOClass(domain).getMethods();
 		Map dtoMap = DTOUtils.go(domain);
 		for(Method dtoMethod : dtoMethods){
+			if(dtoMethod.getName().equals("getMetadata")){
+				continue;
+			}
 			//只判断getter方法
 			if(POJOUtils.isGetMethod(dtoMethod)){
 				//如果dtoMap中有该字段，并且值为null
