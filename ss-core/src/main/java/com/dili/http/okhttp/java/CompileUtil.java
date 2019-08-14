@@ -28,7 +28,7 @@ public class CompileUtil {
 //		System.out.println("compile:"+classContent);
 //		System.out.println("========================================================");
 		try {
-			String cn = classFullname.substring(classFullname.lastIndexOf(".")+1);
+			String cn = classFullname.substring(classFullname.lastIndexOf(".")+1).trim();
 			Map<String, byte[]> results = compiler.compile(cn+".java", classContent);
 			Class<?> clazz = compiler.loadClass(classFullname, results);
 			classes.put(clazz.getName(), clazz);
