@@ -49,7 +49,13 @@ public class ReturnTypeHandlerFactory {
         if(strategy == null){
             return null;
         }
-        return strategy.convert(value);
+        try {
+            return strategy.convert(value);
+        } catch (Exception e) {
+            //转换失败返回空
+            e.printStackTrace();
+            return null;
+        }
     }
 
     /**
