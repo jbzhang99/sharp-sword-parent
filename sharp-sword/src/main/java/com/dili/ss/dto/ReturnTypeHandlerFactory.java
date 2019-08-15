@@ -52,9 +52,9 @@ public class ReturnTypeHandlerFactory {
         try {
             return strategy.convert(value);
         } catch (Exception e) {
-            //转换失败返回空
+            //转换失败返原值
             e.printStackTrace();
-            return null;
+            return value;
         }
     }
 
