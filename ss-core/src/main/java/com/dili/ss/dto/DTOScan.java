@@ -18,4 +18,6 @@ public @interface DTOScan {
      * @return
      */
     String[] value() default {};
+
+    String file() default "";
 }
