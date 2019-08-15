@@ -49,7 +49,13 @@ public class ReturnTypeHandlerFactory {
         if(strategy == null){
             return null;
         }
-        return strategy.convert(value);
+        try {
+            return strategy.convert(value);
+        } catch (Exception e) {
+            //转换失败返回空
+            e.printStackTrace();
+            return null;
+        }
     }
 
     /**
@@ -99,7 +105,7 @@ public class ReturnTypeHandlerFactory {
 
         @Override
         public Object convert(Object value) {
-            return Long.parseLong(value.toString());
+            return StringUtils.isBlank(value.toString())?null:Long.parseLong(value.toString());
         }
     }
 
@@ -110,7 +116,7 @@ public class ReturnTypeHandlerFactory {
 
         @Override
         public Object convert(Object value) {
-            return Integer.parseInt(value.toString());
+            return StringUtils.isBlank(value.toString())?null:Integer.parseInt(value.toString());
         }
     }
 
@@ -121,7 +127,7 @@ public class ReturnTypeHandlerFactory {
 
         @Override
         public Object convert(Object value) {
-            return Float.parseFloat(value.toString());
+            return StringUtils.isBlank(value.toString())?null:Float.parseFloat(value.toString());
         }
     }
 
@@ -132,7 +138,7 @@ public class ReturnTypeHandlerFactory {
 
         @Override
         public Object convert(Object value) {
-            return Double.parseDouble(value.toString());
+            return StringUtils.isBlank(value.toString())?null:Double.parseDouble(value.toString());
         }
     }
 
@@ -143,7 +149,7 @@ public class ReturnTypeHandlerFactory {
 
         @Override
         public Object convert(Object value) {
-            return Byte.parseByte(value.toString());
+            return StringUtils.isBlank(value.toString())?null:Byte.parseByte(value.toString());
         }
     }
 
@@ -154,7 +160,7 @@ public class ReturnTypeHandlerFactory {
 
         @Override
         public Object convert(Object value) {
-            return Boolean.parseBoolean(value.toString());
+            return StringUtils.isBlank(value.toString())?null:Boolean.parseBoolean(value.toString());
         }
     }
 
@@ -165,7 +171,7 @@ public class ReturnTypeHandlerFactory {
 
         @Override
         public Object convert(Object value) {
-            return new BigDecimal(value.toString());
+            return StringUtils.isBlank(value.toString())?null:new BigDecimal(value.toString());
         }
     }
 
@@ -176,7 +182,7 @@ public class ReturnTypeHandlerFactory {
 
         @Override
         public Object convert(Object value) {
-            return getClobString((Clob)value);
+            return StringUtils.isBlank(value.toString())?null:getClobString((java.sql.Clob)value);
         }
     }
 
@@ -187,6 +193,9 @@ public class ReturnTypeHandlerFactory {
 
         @Override
         public Object convert(Object value) {
+            if(StringUtils.isBlank(value.toString())){
+                return null;
+            }
             if(String.class.equals(value.getClass())){
                 return Instant.from(DateTimeFormatter.ofPattern("yyyy:MM:dd HH:mm:ss").withZone(ZoneId.systemDefault()).parse((String)value));
             } else if(Long.class.equals(value.getClass())){
@@ -203,6 +212,9 @@ public class ReturnTypeHandlerFactory {
 
         @Override
         public Object convert(Object value) {
+            if(StringUtils.isBlank(value.toString())){
+                return null;
+            }
             if(String.class.equals(value.getClass())){
                 return LocalDateTime.parse((String)value, DateTimeFormatter.ofPattern("yyyy:MM:dd HH:mm:ss").withZone(ZoneId.systemDefault()));
             }else if(Long.class.equals(value.getClass())){
@@ -219,6 +231,9 @@ public class ReturnTypeHandlerFactory {
 
         @Override
         public Object convert(Object value) {
+            if(StringUtils.isBlank(value.toString())){
+                return null;
+            }
             // 如果当前字段的值不是日期型, 转换返回值，并且将新的返回值填入委托对象中
             if(String.class.equals(value.getClass())){
                 try {
@@ -237,7 +252,7 @@ public class ReturnTypeHandlerFactory {
         }
     }
 
-    private static String getClobString(Clob c) {
+    private static String getClobString(java.sql.Clob c) {
         try {
             Reader reader=c.getCharacterStream();
             if (reader == null) {
