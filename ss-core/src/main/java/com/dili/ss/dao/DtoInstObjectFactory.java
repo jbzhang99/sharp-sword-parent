@@ -14,7 +14,7 @@ import java.util.Properties;
  * </objectFactory>
  * Created by asiamaster on 2017/7/31 0031.
  */
-public class DtoObjectFactory extends DefaultObjectFactory {
+public class DtoInstObjectFactory extends DefaultObjectFactory {
 
 	private static final long serialVersionUID = 908294397084500018L;
 
@@ -30,7 +30,7 @@ public class DtoObjectFactory extends DefaultObjectFactory {
 	@Override
 	public <T> T create(Class<T> type) {
 		if(type.isInterface() && IDTO.class.isAssignableFrom(type)){
-			return (T) DTOUtils.newDTO((Class<IDTO>)type);
+			return (T) DTOUtils.newInstance((Class<IDTO>)type);
 		}else {
 			return super.create(type);
 		}
