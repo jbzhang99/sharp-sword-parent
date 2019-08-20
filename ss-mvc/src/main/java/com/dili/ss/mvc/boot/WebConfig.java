@@ -3,6 +3,7 @@ package com.dili.ss.mvc.boot;
 import com.dili.ss.mvc.converter.JsonHttpMessageConverter;
 import com.dili.ss.util.SpringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -37,6 +38,8 @@ import java.util.concurrent.ThreadPoolExecutor;
 //@EnableWebMvc //不能使用@EnableWebMvc
 public class WebConfig implements WebMvcConfigurer {
 
+	@Value("${web.instanceResolver:false}")
+	private Boolean instanceResolver;
 	@Autowired
 	public Environment env;
 
@@ -143,9 +146,10 @@ public class WebConfig implements WebMvcConfigurer {
 
 	@Override
 	public void addArgumentResolvers(List<HandlerMethodArgumentResolver> argumentResolvers) {
-		try {
+		if(instanceResolver){
+			argumentResolvers.add(new DTOInstArgumentResolver());
+		}else {
 			argumentResolvers.add(new DTOArgumentResolver());
-		} catch (Exception e) {
 		}
 	}
 
@@ -211,5 +215,13 @@ public class WebConfig implements WebMvcConfigurer {
 		executor.setWaitForTasksToCompleteOnShutdown(true);
 		//同时，这里还设置了setAwaitTerminationSeconds(60)，该方法用来设置线程池中任务的等待时间，如果超过这个时候还没有销毁就强制销毁，以确保应用最后能够被关闭，而不是阻塞住。
 		executor.setAwaitTerminationSeconds(60);
+	}
+
+	public Boolean getInstanceResolver() {
+		return instanceResolver;
+	}
+
+	public void setInstanceResolver(Boolean instanceResolver) {
+		this.instanceResolver = instanceResolver;
 	}
 }
