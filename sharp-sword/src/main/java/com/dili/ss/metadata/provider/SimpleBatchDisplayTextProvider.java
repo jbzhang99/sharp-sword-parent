@@ -1,20 +1,9 @@
 package com.dili.ss.metadata.provider;
 
 import com.alibaba.fastjson.JSONObject;
-import com.dili.ss.dto.IDTO;
-import com.dili.ss.metadata.BatchValueProvider;
-import com.dili.ss.metadata.FieldMeta;
-import com.dili.ss.metadata.ObjectMeta;
-import com.dili.ss.metadata.ValuePair;
-import com.dili.ss.service.CommonService;
-import com.dili.ss.util.POJOUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.util.CollectionUtils;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -22,7 +11,12 @@ import java.util.Map;
  */
 @Component
 public class SimpleBatchDisplayTextProvider extends BatchSqlDisplayTextProviderAdaptor {
-
+    //    关联(数据库)表名
+    protected static final String RELATION_TABLE_KEY = "_relationTable";
+    //    关联(数据库)表的主键名
+    protected static final String RELATION_TABLE_PK_FIELD_KEY = "_relationTablePkField";
+    //    查询参数json
+    protected static final String QUERY_PARAMS_KEY = "queryParams";
     /**
      * 返回主DTO和关联DTO需要转义的字段名
      * Map中key为主DTO在页面(datagrid)渲染时需要的字段名， value为关联DTO中对应的字段名

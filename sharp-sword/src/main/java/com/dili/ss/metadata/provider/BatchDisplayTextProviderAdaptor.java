@@ -24,16 +24,11 @@ import java.util.function.Function;
 @Component
 public abstract class BatchDisplayTextProviderAdaptor implements BatchValueProvider {
     protected static final Logger log = LoggerFactory.getLogger(BatchDisplayTextProviderAdaptor.class);
-    //    转义字段json，如果为string，则key为filed属性
+//    转义字段json，如果为string，则key为filed属性
     protected static final String ESCAPE_FILEDS_KEY = "_escapeFileds";
-    //    关联(数据库)表的主键名
-    protected static final String RELATION_TABLE_PK_FIELD_KEY = "_relationTablePkField";
-    //    关联(数据库)表名
-    protected static final String RELATION_TABLE_KEY = "_relationTable";
-    //    主DTO与关联DTO的关联(java bean)属性，即外键
+//    主DTO与关联DTO的关联(java bean)属性，即外键
     protected static final String FK_FILED_KEY = "_fkField";
-    //    查询参数json
-    protected static final String QUERY_PARAMS_KEY = "queryParams";
+
     @Autowired
     protected CommonService commonService;
     @Autowired

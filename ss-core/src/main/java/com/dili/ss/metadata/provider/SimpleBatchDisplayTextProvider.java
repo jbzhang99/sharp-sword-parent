@@ -11,7 +11,12 @@ import java.util.Map;
  */
 @Component
 public class SimpleBatchDisplayTextProvider extends BatchSqlDisplayTextProviderAdaptor {
-
+    //    关联(数据库)表名
+    protected static final String RELATION_TABLE_KEY = "_relationTable";
+    //    关联(数据库)表的主键名
+    protected static final String RELATION_TABLE_PK_FIELD_KEY = "_relationTablePkField";
+    //    查询参数json
+    protected static final String QUERY_PARAMS_KEY = "queryParams";
     /**
      * 返回主DTO和关联DTO需要转义的字段名
      * Map中key为主DTO在页面(datagrid)渲染时需要的字段名， value为关联DTO中对应的字段名

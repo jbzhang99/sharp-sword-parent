@@ -1,6 +1,5 @@
 package com.dili.ss.mvc.controller;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.dili.ss.domain.BaseOutput;
 import com.dili.ss.util.SpringUtil;
@@ -11,8 +10,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.error.ErrorAttributes;
 import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.request.WebRequest;
 
 import javax.servlet.http.HttpServletRequest;
@@ -41,15 +42,14 @@ public class MainsiteErrorController implements ErrorController {
 	 * @param response
 	 * @return
 	 */
-//	@RequestMapping(produces = {MediaType.APPLICATION_JSON_VALUE})
-//	@ResponseBody
-	public String ajaxError(WebRequest request, HttpServletResponse response){
+	@RequestMapping(produces = {MediaType.APPLICATION_JSON_VALUE})
+	@ResponseBody
+	public BaseOutput<String> ajaxError(WebRequest request, HttpServletResponse response){
 //		Map<String, Object> body = getErrorAttributes(request, true);
 //		HttpStatus status = getStatus(request);
-		BaseOutput output = buildBody(request,true);
-		log.error(JSONObject.toJSONString(output));
-//		return new ResponseEntity(body, status);
-		return JSON.toJSONString(output);
+		BaseOutput baseOutput = buildBody(request,true);
+		log.error(JSONObject.toJSONString(baseOutput));
+		return baseOutput;
 	}
 
 	/**
@@ -96,13 +96,12 @@ public class MainsiteErrorController implements ErrorController {
 		return ERROR_PATH+"/default";
 	}
 
-//	private Map<String, Object> getErrorAttributes(HttpServletRequest request, boolean includeStackTrace) {
 	private Map<String, Object> getErrorAttributes(WebRequest request, boolean includeStackTrace) {
 //		RequestAttributes requestAttributes = new ServletRequestAttributes(request);
 		return errorAttributes.getErrorAttributes(request, includeStackTrace);
 	}
 
-	protected HttpStatus getStatus(WebRequest request) {
+	private HttpStatus getStatus(WebRequest request) {
 		Integer statusCode = (Integer) request
 				.getAttribute("javax.servlet.error.status_code", 0);
 		if (statusCode == null) {
