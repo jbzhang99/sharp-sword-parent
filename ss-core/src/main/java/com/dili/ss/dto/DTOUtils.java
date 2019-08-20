@@ -44,7 +44,7 @@ public class DTOUtils {
 
 
 	/**
-	 * 将DTO对象或其代理对象统一还原回DTO对象
+	 * 将DTOInstance或其代理对象统一还原回DTO对象
 	 *
 	 * @param obj
 	 * @return 如果不是DTO对象实例或其代理对象，则返回null;
@@ -211,7 +211,7 @@ public class DTOUtils {
 	}
 
 	/**
-	 * 将DTO对象的实例转成代理的目标接口或对象
+	 * 将DTO对象的实例转成代理的目标接口对象
 	 *
 	 * @param realObj
 	 *          DTO对象实例
@@ -224,7 +224,7 @@ public class DTOUtils {
 	}
 
 	/**
-	 * 将DTO对象的实例转成代理的目标接口或对象
+	 * 将DTO对象的实例转成代理的DTO Instance对象
 	 *
 	 * @param realObj
 	 *          DTO对象实例
@@ -247,7 +247,7 @@ public class DTOUtils {
 	}
 
 	/**
-	 * 根据proxyClz new 一个DTO对象
+	 * 根据proxyClz new 一个DTO代理对象
 	 * @param dtoClz <T extends IDTO>接口
 	 * @return
 	 */
@@ -432,9 +432,6 @@ public class DTOUtils {
 
 	/**
 	 * 判断是否为DTO对象的实例<br>
-	 * 包括以下两种情况：
-	 * <li>本身就是一个DTO对象的实例</li>
-	 * <li>DTO对象的代理对象</li>
 	 *
 	 * @param object
 	 * @return
@@ -497,7 +494,7 @@ public class DTOUtils {
 	}
 
 	/**
-	 * 将两个DTO接口连接起来<br>
+	 * 将两个DTO代理对象连接起来<br>
 	 * 要求两个DTO的字段没有重复的,有重复的则以master为准
 	 *
 	 * @param <T>
