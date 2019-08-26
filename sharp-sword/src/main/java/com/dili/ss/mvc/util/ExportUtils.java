@@ -13,7 +13,6 @@ import com.dili.ss.util.IExportThreadPoolExecutor;
 import com.dili.ss.util.SpringUtil;
 import okhttp3.OkHttpClient;
 import okhttp3.Response;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.streaming.SXSSFSheet;
@@ -198,16 +197,16 @@ public class ExportUtils {
 		        futures.add(future);
 	        }
 	        int current = 0;
-	        for (Future<JSONArray> future : futures) {
-		        try {
-			        JSONArray rowDatas = future.get();
-			        buildSingleData(current++, exportParam.getColumns(), rowDatas, sheet, dataColumnStyle);
-		        } catch (InterruptedException e) {
-			        e.printStackTrace();
-		        } catch (Exception e) {
-			        e.printStackTrace();
-		        }
-	        }
+            try {
+                for (Future<JSONArray> future : futures) {
+                    JSONArray rowDatas = future.get();
+                    buildSingleData(current++, exportParam.getColumns(), rowDatas, sheet, dataColumnStyle);
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -364,6 +363,9 @@ public class ExportUtils {
 //		            param.put("SessionId", request.getHeader("SessionId"));
 		        while(enumeration.hasMoreElements()) {
 			        String key = enumeration.nextElement();
+                    if(key.trim().equalsIgnoreCase("Accept-Encoding")) {
+                        continue;
+                    }
 			        headersMap.put(key, request.getHeader(key));
 		        }
 	        }

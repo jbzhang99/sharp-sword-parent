@@ -1,11 +1,74 @@
 package com.dili.ss.util;
 
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+
 /**
  * byte数组工具
  */
 public class ByteArrayUtils {
+
+    /**
+     * bytes转shorts, 由低到高即低地址存放低字节
+     * 两个byte为一个short
+     * @param bytes
+     * @return
+     */
+    public static short[] bytes2short(byte[] bytes) {
+        if(bytes == null){
+            return null;
+        }
+        short[] shorts = new short[bytes.length/2];
+        ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN).asShortBuffer().get(shorts);
+        return shorts;
+    }
+
+    /**
+     * short转bytes, 由高到低
+     * @param shorts
+     * @return
+     */
+    public static byte[] short2bytes(Short shorts) {
+        if(shorts == null){
+            return null;
+        }
+        byte[] bytes = new byte[2];
+        ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN).asShortBuffer().put(shorts);
+        return bytes;
+    }
+
+    /**
+     * bytes转shorts, 由高到低即高地址存放低字节
+     * 两个byte为一个short
+     * @param bytes
+     * @return
+     */
+    public static short[] bytes2short2(byte[] bytes) {
+        if(bytes == null){
+            return null;
+        }
+        short[] shorts = new short[bytes.length/2];
+        ByteBuffer.wrap(bytes).order(ByteOrder.BIG_ENDIAN).asShortBuffer().get(shorts);
+        return shorts;
+    }
+
+    /**
+     * shorts转bytes, 由低到高
+     * @param shorts
+     * @return
+     */
+    public static byte[] short2bytes2(Short shorts) {
+        if(shorts == null){
+            return null;
+        }
+        byte[] bytes = new byte[2];
+        ByteBuffer.wrap(bytes).order(ByteOrder.BIG_ENDIAN).asShortBuffer().put(shorts);
+        return bytes;
+    }
+
     /**
      * int --> byte[] 整形转byte[]
+     * 比如int:1则是{1,0,0,0}
      * @param res
      * @return
      */
@@ -45,7 +108,7 @@ public class ByteArrayUtils {
     }
 
     /**
-     * byte[]转int
+     * byte[]转int 底位到高位
      * @param bytes 需要转换成int的数组
      * @return int值
      */
@@ -70,7 +133,7 @@ public class ByteArrayUtils {
         return sbuf.toString();
     }
 
-    public static byte[] hexStringToByteArray(String s) {
+    public static byte[] hexString2bytearray(String s) {
         int len = s.length();
         byte[] ba = new byte[len / 2];
 
@@ -81,5 +144,25 @@ public class ByteArrayUtils {
             ba[i] = b;
         }
         return ba;
+    }
+
+    public static byte[] toPrimitives(Byte[] objBytes)
+    {
+        byte[] bytes = new byte[objBytes.length];
+        for(int i = 0; i < objBytes.length; i++) {
+            bytes[i] = objBytes[i];
+        }
+        return bytes;
+    }
+
+    // byte[] to Byte[]
+    public static Byte[] toObjects(byte[] bytesPrim) {
+        Byte[] bytes = new Byte[bytesPrim.length];
+        int i = 0;
+        for (byte b : bytesPrim) {
+            // Autoboxing
+            bytes[i++] = b;
+        }
+        return bytes;
     }
 }

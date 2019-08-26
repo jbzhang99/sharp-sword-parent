@@ -605,7 +605,9 @@ public abstract class BaseServiceAdaptor<T extends IBaseDomain, KEY extends Seri
                     }else{
 						sb.append(", '").append(value).append("'");
                     }
-                    criteria = criteria.andCondition(columnName + " " + operator.value() + "("+sb.substring(1)+")");
+                    if(!sb.toString().isEmpty()) {
+						criteria = criteria.andCondition(columnName + " " + operator.value() + "(" + sb.substring(1) + ")");
+					}
                 }else {
                     criteria = criteria.andCondition(columnName + " " + operator.value() + " '" + value + "' ");
                 }

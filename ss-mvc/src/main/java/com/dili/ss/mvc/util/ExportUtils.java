@@ -363,6 +363,9 @@ public class ExportUtils {
 //		            param.put("SessionId", request.getHeader("SessionId"));
 		        while(enumeration.hasMoreElements()) {
 			        String key = enumeration.nextElement();
+                    if(key.trim().equalsIgnoreCase("Accept-Encoding")) {
+                        continue;
+                    }
 			        headersMap.put(key, request.getHeader(key));
 		        }
 	        }
