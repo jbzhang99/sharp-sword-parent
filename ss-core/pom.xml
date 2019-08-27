@@ -351,10 +351,11 @@
             <artifactId>springloaded</artifactId>
             <version>${springloaded.version}</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/org.jetbrains/annotations -->
         <dependency>
             <groupId>org.jetbrains</groupId>
             <artifactId>annotations</artifactId>
-            <version>RELEASE</version>
+            <version>17.0.0</version>
             <scope>provided</scope>
         </dependency>
         <!-- 一维码依赖 -->
