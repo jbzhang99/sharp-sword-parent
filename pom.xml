@@ -157,12 +157,14 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.7.0</version>
+				<version>3.8.0</version>
 				<!-- 编译JDK版本 -->
 				<configuration>
 					<source>1.8</source>
 					<target>1.8</target>
 					<encoding>UTF-8</encoding>
+					<!-- 支持参数名解析 -->
+					<parameters>true</parameters>
 				</configuration>
 			</plugin>
 			<plugin>
