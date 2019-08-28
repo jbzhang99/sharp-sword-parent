@@ -575,14 +575,14 @@ public class DTOInstArgumentResolver implements HandlerMethodArgumentResolver {
 		if(entry == null || entry.getValue() == null){
 			return null;
 		}
-		String val = entry.getValue().toString();
+		Object val = entry.getValue();
 		if(fields.containsKey(entry.getKey())){
 			if(String.class.equals(fields.get(entry.getKey()))){
-				return val;
+				return val.toString();
 			}
 			return ReturnTypeHandlerFactory.convertValue(fields.get(entry.getKey()), val);
 		}
-		return val == null ? null : StringUtils.isBlank(val) ? null : val;
+		return val == null ? null : val;
 	}
 
 	/**

@@ -80,7 +80,7 @@ public class ReturnTypeHandlerFactory {
             if(value instanceof String){
                 return (String)value;
             }
-            return value == null ? null :String.valueOf(value);
+            return value == null ? null :value.toString();
         }
     }
 
@@ -94,7 +94,7 @@ public class ReturnTypeHandlerFactory {
             if(value instanceof List){
                 return value;
             }
-            return Lists.newArrayList(value);
+            return value instanceof List ? value : Lists.newArrayList(new Object[]{value});
         }
     }
 
