@@ -110,7 +110,6 @@ public class DTOUtils {
 				// dont care
 			} catch (Throwable throwable) {
 				throwable.printStackTrace();
-				return null;
 			}
 		}
 		return null;
@@ -508,16 +507,30 @@ public class DTOUtils {
 	 * @return
 	 */
 	public static <T extends IDTO> T link(T master, IDTO second, Class<T> masterClazz) {
-		if (second == null) {
-			return master;
-		}
-		if (master == null) {
-			return as(second, masterClazz);
-		}
-		DTO temp = go(second);
-		temp.putAll(go(master));
-		return as(second, masterClazz);
+		return link(master, second, masterClazz, false);
 	}
+
+    /**
+     * 将两个DTO代理对象连接起来<br>
+     * 要求两个DTO的字段没有重复的,有重复的则以master为准
+     *
+     * @param <T>
+     * @param master
+     * @param second
+     * @param masterClazz
+     * @return
+     */
+    public static <T extends IDTO> T link(T master, IDTO second, Class<T> masterClazz, boolean isInstance) {
+        if (second == null) {
+            return master;
+        }
+        if (master == null) {
+            return as(second, masterClazz);
+        }
+        DTO temp = go(second);
+        temp.putAll(go(master));
+        return isInstance ? asInstance(second, masterClazz) : as(second, masterClazz);
+    }
 
 	//  ===================================  内部方法  ===================================
 

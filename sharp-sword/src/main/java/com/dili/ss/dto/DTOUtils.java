@@ -46,7 +46,7 @@ public class DTOUtils {
 	/**
 	 * 将DTOInstance或其代理对象统一还原回DTO对象
 	 *
-	 * @param obj
+	 * @param obj DTO、DTO代理或DTO Instance
 	 * @return 如果不是DTO对象实例或其代理对象，则返回null;
 	 */
 	public static DTO go(Object obj) {
@@ -55,7 +55,7 @@ public class DTOUtils {
 
 	/**
 	 * 获取DTO或实例的代理对象，支持默认方法
-	 * @param obj
+	 * @param obj   DTO、DTO代理或DTO Instance
 	 * @param withDef 是否支持默认接口方法
 	 * @return
 	 */
@@ -110,7 +110,6 @@ public class DTOUtils {
 				// dont care
 			} catch (Throwable throwable) {
 				throwable.printStackTrace();
-				return null;
 			}
 		}
 		return null;
