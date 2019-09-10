@@ -1,9 +1,6 @@
 package com.dili.ss.uid.handler;
 
 public interface BizNumberManager {
-    void setFixedStep(int fixedStep);
-
-    void setRangeStep(int rangeStep);
 
     void setBizNumberComponent(BizNumberComponent bizNumberComponent);
 
@@ -12,9 +9,20 @@ public interface BizNumberManager {
      * @param type
      * @param dateFormat
      * @param length
-     * @param range
+     * @param step
+     * @param increment
      * @return
      */
-    Long getBizNumberByType(String type, String dateFormat, int length, String range);
+    Long getBizNumberByType(String type, String dateFormat, int length, long step, int increment);
+
+    /**
+     * 根据业务类型获取增量为1的业务号
+     * @param type
+     * @param dateFormat
+     * @param length
+     * @param step
+     * @return
+     */
+    Long getBizNumberByType(String type, String dateFormat, int length, long step);
 
 }
