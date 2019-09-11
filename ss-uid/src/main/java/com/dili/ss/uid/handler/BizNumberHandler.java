@@ -2,6 +2,7 @@ package com.dili.ss.uid.handler;
 
 import com.dili.http.okhttp.utils.B;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.stereotype.Component;
 
@@ -14,6 +15,17 @@ public class BizNumberHandler {
 
     @Autowired
     private BizNumberComponent bizNumberComponent;
+    /**
+     * 固定步长值，默认为50
+     */
+    @Value("${uid.fixedStep:50}")
+    private int fixedStep;
+
+    /**
+     * 范围步长值，默认为最大范围的20倍
+     */
+    @Value("${uid.rangeStep:20}")
+    private int rangeStep;
 
     private BizNumberManager bizNumberManager;
 
@@ -39,10 +51,10 @@ public class BizNumberHandler {
         long step;
         //范围步长值取最大自增值的rangeStep倍
         if (ranges.length == 2) {
-            step = Long.parseLong(ranges[1]);
+            step = Long.parseLong(ranges[1]) * rangeStep;
         } else {
             //固定步长值为固定值的fixedStep倍
-            step = Long.parseLong(ranges[0]);
+            step = Long.parseLong(ranges[0]) * fixedStep;
         }
         if(increment == 1){
             return bizNumberManager.getBizNumberByType(type, dateFormat, length, step);
