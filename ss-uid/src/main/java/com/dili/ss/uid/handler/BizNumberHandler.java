@@ -1,6 +1,5 @@
 package com.dili.ss.uid.handler;
 
-import com.dili.http.okhttp.utils.B;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
@@ -31,10 +30,7 @@ public class BizNumberHandler {
 
     @PostConstruct
     public void init() {
-        try {
-            bizNumberManager = (BizNumberManager)((Class) B.b.g("bizNumberManagerImpl")).newInstance();
-        } catch (Exception e) {
-        }
+        bizNumberManager = new BizNumberManagerImpl();
         bizNumberManager.setBizNumberComponent(bizNumberComponent);
     }
     /**
