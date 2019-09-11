@@ -4,13 +4,14 @@ import com.dili.ss.dto.IBaseDomain;
 import com.dili.ss.metadata.FieldEditor;
 import com.dili.ss.metadata.annotation.EditMode;
 import com.dili.ss.metadata.annotation.FieldDef;
+import tk.mybatis.mapper.annotation.Version;
 
 import javax.persistence.*;
 import java.util.Date;
 
 /**
  * 由MyBatis Generator工具自动生成
- * 
+ *
  * This file was generated on 2018-11-01 14:56:53.
  */
 @Table(name = "`biz_number`")
@@ -45,13 +46,13 @@ public interface BizNumber extends IBaseDomain {
 
     void setMemo(String memo);
 
-//    @Version
+    @Version
     @Column(name = "`version`")
     @FieldDef(label="版本号", maxLength = 20)
     @EditMode(editor = FieldEditor.Text, required = false)
-    String getVersion();
+    Long getVersion();
 
-    void setVersion(String version);
+    void setVersion(Long version);
 
     @Column(name = "`modified`")
     @FieldDef(label="修改时间")
