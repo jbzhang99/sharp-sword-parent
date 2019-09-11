@@ -40,34 +40,40 @@ public class BizNumberComponent {
         //每天最大分配号数
         int max = new Double(Math.pow(10, length)).intValue();
         Long initBizNumber = getInitBizNumber(DateUtils.format(dateFormat), length);
+        //先申请占位
+        Long tempStartSeq = 0L;
         if(startSeq != null){
             //新的一天,新日期的值大于数据库中的值，则采用新算的值
             if(startSeq > bizNumber.getValue()){
-                idSequence.setStartSeq(startSeq);
+                tempStartSeq = startSeq;
             }
-            //解决分布式环境下第二天的第二台服务器第一笔单日期未更新问题---st
+            //解决分布式环境下第二天的第二台服务器第一笔单日期未更新问题
             //判断新日期计息的值比数据库中的值小，则采用数据库中的value
-            else if(startSeq < bizNumber.getValue()){
-                idSequence.setStartSeq(bizNumber.getValue());
+//            else if(startSeq <= bizNumber.getValue()){
+            else{
+                tempStartSeq = bizNumber.getValue();
             }
-            //解决分布式环境下第二天的第二台服务器第一笔单日期未更新问题---end
-            if(idSequence.getStartSeq() > initBizNumber + max - 1){
+            if(tempStartSeq > initBizNumber + max - 1){
                 throw new RuntimeException("当天业务编码分配数超过" + max + ",无法分配!");
             }
         }else{
-            idSequence.setStartSeq(bizNumber.getValue());
+            tempStartSeq = bizNumber.getValue();
         }
-        idSequence.setFinishSeq(idSequence.getStartSeq() + idSequence.getStep());
-        bizNumber.setValue(idSequence.getFinishSeq());
+        bizNumber.setValue(tempStartSeq + idSequence.getStep());
         try {
             //当更新失败后，返回空，外层进行重试
-            if (bizNumberMapper.updateByPrimaryKey(bizNumber) < 1) {
+            int count = bizNumberMapper.updateByPrimaryKey(bizNumber);
+            if (count < 1) {
+                System.out.println("乐观锁更新失败后，返回空，外层进行重试!");
                 return null;
             }
         }catch (RuntimeException e){
             System.out.println("当更新失败后，返回空，外层进行重试:"+e.getMessage());
             return null;
         }
+        //设置idSequence
+        idSequence.setStartSeq(tempStartSeq);
+        idSequence.setFinishSeq(tempStartSeq + idSequence.getStep());
         return idSequence;
     }
 

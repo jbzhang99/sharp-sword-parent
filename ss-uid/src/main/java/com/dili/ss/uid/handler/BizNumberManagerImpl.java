@@ -19,7 +19,7 @@ public class BizNumberManagerImpl implements BizNumberManager{
     protected ConcurrentHashMap<String, SequenceNo> bizNumberMap = new ConcurrentHashMap<>();
 
     //获取失败后的重试次数
-    protected static final int RETRY = 3;
+    protected static final int RETRY = 5;
 
     /**
      * 根据业务类型获取业务号
@@ -131,6 +131,56 @@ public class BizNumberManagerImpl implements BizNumberManager{
         return seqId;
     }
 
+    /**
+     * 根据日期格式和长度，获取下一个编号, 增量为1
+     * @param type
+     * @param startSeq
+     * @param dateFormat
+     * @param length
+     * @param step
+     * @return
+     */
+    private Long getNextSeqId(String type, Long startSeq, String dateFormat, int length, long step) {
+        lock.lock();
+        SequenceNo idSequence = bizNumberMap.get(type);
+        if (idSequence == null) {
+            //固定步长值为fixedStep
+            idSequence = new SequenceNo(step);
+            bizNumberMap.putIfAbsent(type, idSequence);
+            idSequence = bizNumberMap.get(type);
+        }
+        //如果是新的一天，startSeq不为空，而是计算的initNumber
+        //如果bizNumberMap.get(type)为空，StartSeq >= FinishSeq
+        if (startSeq != null || idSequence.getStartSeq() >= idSequence.getFinishSeq()) {
+            idSequence = bizNumberComponent.getSeqNoByNewTransactional(idSequence, type, startSeq, dateFormat, length);
+            if (idSequence == null) {
+                lock.unlock();
+                return -1L;
+            }
+        }
+        try {
+            return idSequence.next();
+        }finally {
+            lock.unlock();
+        }
+    }
+
+    /**
+     * 获取日期加每日计数量的初始化字符串，最低位从1开始
+     * @param dateStr
+     * @param length 编码位数(不包含日期位数)
+     * @return
+     */
+    private Long getInitBizNumber(String dateStr, int length) {
+        return StringUtils.isBlank(dateStr) ? 1 : NumberUtils.toLong(dateStr) * new Double(Math.pow(10, length)).longValue() + 1;
+    }
+
+    @Override
+    public void setBizNumberComponent(BizNumberComponent bizNumberComponent) {
+        this.bizNumberComponent = bizNumberComponent;
+    }
+
+
 //    public static void main(String[] args) throws ExecutionException, InterruptedException {
 //        ExecutorService executor = new ExportThreadPoolExecutor().getCustomThreadPoolExecutor();
 //        Callable thread = new Callable(){
@@ -183,53 +233,4 @@ public class BizNumberManagerImpl implements BizNumberManager{
 //        }
 //        return idSequence.next();
 //    }
-
-    /**
-     * 根据日期格式和长度，获取下一个编号, 增量为1
-     * @param type
-     * @param startSeq
-     * @param dateFormat
-     * @param length
-     * @param step
-     * @return
-     */
-    private Long getNextSeqId(String type, Long startSeq, String dateFormat, int length, long step) {
-        lock.lock();
-        SequenceNo idSequence = bizNumberMap.get(type);
-        if (idSequence == null) {
-            //固定步长值为fixedStep
-            idSequence = new SequenceNo(step);
-            bizNumberMap.putIfAbsent(type, idSequence);
-            idSequence = bizNumberMap.get(type);
-        }
-        //如果是新的一天，startSeq不为空，而是计算的initNumber
-        //如果bizNumberMap.get(type)为空，StartSeq >= FinishSeq
-        if (startSeq != null || idSequence.getStartSeq() >= idSequence.getFinishSeq()) {
-            idSequence = bizNumberComponent.getSeqNoByNewTransactional(idSequence, type, startSeq, dateFormat, length);
-            if (idSequence == null) {
-                lock.unlock();
-                return -1L;
-            }
-        }
-        try {
-            return idSequence.next();
-        }finally {
-            lock.unlock();
-        }
-    }
-
-    /**
-     * 获取日期加每日计数量的初始化字符串，最低位从1开始
-     * @param dateStr
-     * @param length 编码位数(不包含日期位数)
-     * @return
-     */
-    private Long getInitBizNumber(String dateStr, int length) {
-        return StringUtils.isBlank(dateStr) ? 1 : NumberUtils.toLong(dateStr) * new Double(Math.pow(10, length)).longValue() + 1;
-    }
-
-    @Override
-    public void setBizNumberComponent(BizNumberComponent bizNumberComponent) {
-        this.bizNumberComponent = bizNumberComponent;
-    }
 }
