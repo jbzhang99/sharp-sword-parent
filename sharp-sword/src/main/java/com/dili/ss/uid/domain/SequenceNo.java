@@ -9,11 +9,18 @@ public class SequenceNo {
 	private Long step = 50L;//步长
 	private AtomicLong startSeq = new AtomicLong(1);//开始ID
 	private Long finishSeq = 0L;//结束ID
-	public synchronized Long next(){
+
+	public SequenceNo(){}
+
+	public SequenceNo(long step){
+		this.step = step;
+	}
+
+	public Long next(){
 		return startSeq.getAndIncrement();
 	}
 	//增长指定数值
-	public synchronized Long next(int increment){
+	public Long next(int increment){
 		return startSeq.getAndAccumulate(increment, (a, b) -> a + b);
 	}
 
