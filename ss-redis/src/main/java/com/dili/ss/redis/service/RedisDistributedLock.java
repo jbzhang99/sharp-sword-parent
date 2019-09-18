@@ -4,14 +4,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
+import org.springframework.data.redis.connection.ReturnType;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Component;
-import redis.clients.jedis.Jedis;
-import redis.clients.jedis.JedisCluster;
 
-import java.util.Collections;
+import java.nio.charset.Charset;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -105,36 +104,70 @@ public class RedisDistributedLock{
         }
     }
 
-    public boolean releaseLock(String key,String requestId) {
-        // 释放锁的时候，有可能因为持锁之后方法执行时间大于锁的有效期，此时有可能已经被另外一个线程持有锁，所以不能直接删除
-        try {
-            //由于在RedisCacheConfig中配置了redisTemplate.setValueSerializer(jackson2JsonRedisSerializer);
-            //所以redis中的值在两边有引号，对比值时需要在两边加上引号
-            final String value = "\""+requestId+"\"";
-            // 使用lua脚本删除redis中匹配value的key，可以避免由于方法执行时间过长而redis锁自动过期失效的时候误删其他线程的锁
-            // spring自带的执行脚本方法中，集群模式直接抛出不支持执行脚本的异常，所以只能拿到原redis的connection来执行脚本
-            RedisCallback<Long> callback = (connection) -> {
-                Object nativeConnection = connection.getNativeConnection();
-                // 集群模式和单机模式虽然执行脚本的方法一样，但是没有共同的接口，所以只能分开执行
-                // 集群模式
-                if (nativeConnection instanceof JedisCluster) {
-                    return (Long) ((JedisCluster) nativeConnection).eval(UNLOCK_LUA, Collections.singletonList(key), Collections.singletonList(value));
-                }
-                // 单机模式
-                else if (nativeConnection instanceof Jedis) {
-                    return (Long) ((Jedis) nativeConnection).eval(UNLOCK_LUA, Collections.singletonList(key), Collections.singletonList(value));
-                }
-                return 0L;
-            };
-            Long result = (Long)redisTemplate.execute(callback);
-            return result != null && result > 0;
-        } catch (Exception e) {
-            logger.error("release lock occured an exception", e);
-        } finally {
-            // 清除掉ThreadLocal中的数据，避免内存溢出
-            //lockFlag.remove();
-        }
-        return false;
-    }
+//    /**
+//     * 获取分布式锁，原子操作
+//     * Lettuces
+//     * @param lockKey
+//     * @param requestId 唯一ID, 可以使用UUID.randomUUID().toString();
+//     * @param expire
+//     * @param timeUnit
+//     * @return
+//     */
+//    public boolean tryLock(String lockKey, String requestId, long expire, TimeUnit timeUnit) {
+//        try{
+//            RedisCallback<Boolean> callback = (connection) -> {
+//                return connection.set(lockKey.getBytes(Charset.forName("UTF-8")), requestId.getBytes(Charset.forName("UTF-8")), Expiration.seconds(timeUnit.toSeconds(expire)), RedisStringCommands.SetOption.SET_IF_ABSENT);
+//            };
+//            return (Boolean)redisTemplate.execute(callback);
+//        } catch (Exception e) {
+//            log.error("redis lock error.", e);
+//        }
+//        return false;
+//    }
 
+    //Jedis方式
+//    public boolean releaseLock(String key,String requestId) {
+//        // 释放锁的时候，有可能因为持锁之后方法执行时间大于锁的有效期，此时有可能已经被另外一个线程持有锁，所以不能直接删除
+//        try {
+//            //由于在RedisCacheConfig中配置了redisTemplate.setValueSerializer(jackson2JsonRedisSerializer);
+//            //所以redis中的值在两边有引号，对比值时需要在两边加上引号
+//            final String value = "\""+requestId+"\"";
+//            // 使用lua脚本删除redis中匹配value的key，可以避免由于方法执行时间过长而redis锁自动过期失效的时候误删其他线程的锁
+//            // spring自带的执行脚本方法中，集群模式直接抛出不支持执行脚本的异常，所以只能拿到原redis的connection来执行脚本
+//            RedisCallback<Long> callback = (connection) -> {
+//                Object nativeConnection = connection.getNativeConnection();
+//                // 集群模式和单机模式虽然执行脚本的方法一样，但是没有共同的接口，所以只能分开执行
+//                // 集群模式
+//                if (nativeConnection instanceof JedisCluster) {
+//                    return (Long) ((JedisCluster) nativeConnection).eval(UNLOCK_LUA, Collections.singletonList(key), Collections.singletonList(value));
+//                }
+//                // 单机模式
+//                else if (nativeConnection instanceof Jedis) {
+//                    return (Long) ((Jedis) nativeConnection).eval(UNLOCK_LUA, Collections.singletonList(key), Collections.singletonList(value));
+//                }
+//                return 0L;
+//            };
+//            Long result = (Long)redisTemplate.execute(callback);
+//            return result != null && result > 0;
+//        } catch (Exception e) {
+//            logger.error("release lock occured an exception", e);
+//        } finally {
+//            // 清除掉ThreadLocal中的数据，避免内存溢出
+//            //lockFlag.remove();
+//        }
+//        return false;
+//    }
+
+    /**
+     * Lettuce方式释放锁
+     * @param lockKey
+     * @param requestId 唯一ID
+     * @return
+     */
+    public boolean releaseLock(String lockKey, String requestId) {
+        RedisCallback<Boolean> callback = (connection) -> {
+            return connection.eval(UNLOCK_LUA.getBytes(), ReturnType.BOOLEAN ,1, lockKey.getBytes(Charset.forName("UTF-8")), requestId.getBytes(Charset.forName("UTF-8")));
+        };
+        return (Boolean)redisTemplate.execute(callback);
+    }
 }

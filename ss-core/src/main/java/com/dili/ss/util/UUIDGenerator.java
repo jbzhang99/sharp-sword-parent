@@ -31,7 +31,7 @@ public class UUIDGenerator {
 
     private static final AtomicLong UUID = new AtomicLong(1000);
     private static int serverNodeId = 1;
-    private static final long UUID_INTERNAL = 2000000000;
+    private static final long UUID_INTERNAL = 2_000_000_000;
 //    private static final int UUID_GENERATE_COUNT = 5;
 //    public static void main(String[] args) {
 //        UUIDGenerator.init(serverNodeId);

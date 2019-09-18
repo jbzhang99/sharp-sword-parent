@@ -3,12 +3,12 @@ package com.dili.ss.redis.service;
 import com.alibaba.fastjson.JSON;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.ValueOperations;
+import org.springframework.data.redis.core.*;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -86,6 +86,30 @@ public class RedisUtil {
     }
 
     /**
+     * 列表添加
+     *
+     * @param k
+     * @param v
+     */
+    public void lPush(String k, Object v) {
+        ListOperations<String, Object> list = redisTemplate.opsForList();
+        list.rightPush(k, v);
+    }
+
+    /**
+     * 列表获取
+     *
+     * @param k
+     * @param start
+     * @param end
+     * @return
+     */
+    public List<Object> lRange(String k, long start, long end) {
+        ListOperations<String, Object> list = redisTemplate.opsForList();
+        return list.range(k, start, end);
+    }
+
+    /**
      * 读取缓存
      *
      * @param key
@@ -128,6 +152,53 @@ public class RedisUtil {
             e.printStackTrace();
             return false;
         }
+    }
+
+    /**
+     * 集合添加
+     *
+     * @param key
+     * @param value
+     */
+    public void add(String key, Object value) {
+        SetOperations<String, Object> set = redisTemplate.opsForSet();
+        set.add(key, value);
+    }
+
+    /**
+     * 集合获取
+     *
+     * @param key
+     * @return
+     */
+    public Set<Object> setMembers(String key) {
+        SetOperations<String, Object> set = redisTemplate.opsForSet();
+        return set.members(key);
+    }
+
+    /**
+     * 有序集合添加
+     *
+     * @param key
+     * @param value
+     * @param scoure
+     */
+    public void zAdd(String key, Object value, double scoure) {
+        ZSetOperations<String, Object> zset = redisTemplate.opsForZSet();
+        zset.add(key, value, scoure);
+    }
+
+    /**
+     * 有序集合获取
+     *
+     * @param key
+     * @param scoure
+     * @param scoure1
+     * @return
+     */
+    public Set<Object> rangeByScore(String key, double scoure, double scoure1) {
+        ZSetOperations<String, Object> zset = redisTemplate.opsForZSet();
+        return zset.rangeByScore(key, scoure, scoure1);
     }
 
     /**
