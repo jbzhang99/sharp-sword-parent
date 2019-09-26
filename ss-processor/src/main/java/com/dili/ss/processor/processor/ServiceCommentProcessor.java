@@ -80,15 +80,13 @@ public class ServiceCommentProcessor extends CommentProcessor {
             Set<? extends Element> set = env.getElementsAnnotatedWith(typeElement);
             for(Element classElement : set){
                 if(serviceScan != null) {
-                    String pkgFullname = ((Symbol.ClassSymbol) classElement).packge().fullname.toString();
-                    for(String path : serviceScan){
-                        //检查包路径不在扫描范围内，则不处理
-                        if(!pkgFullname.startsWith(path)){
-                            return false;
-                        }
+                    //检查元素的包名是否匹配路径,不匹配则直接放过
+                    if(!matchPackage(classElement)){
+                        return false;
                     }
                 }
                 com.sun.tools.javac.util.List<Type> interfaces = ((Symbol.ClassSymbol) classElement).getInterfaces();
+                //如果没有接口，则判断当前类上的注释
                 if(interfaces.isEmpty()){
                     return validClassComment(classElement);
                 }
@@ -131,6 +129,23 @@ public class ServiceCommentProcessor extends CommentProcessor {
         annotataionSet.add(Service.class.getCanonicalName());
         annotataionSet.add(Component.class.getCanonicalName());
         return annotataionSet;
+    }
+
+
+    /**
+     * 元素的包名是否匹配路径
+     * @param classElement
+     * @return
+     */
+    private boolean matchPackage(Element classElement){
+        String pkgFullname = ((Symbol.ClassSymbol) classElement).packge().fullname.toString();
+        for(String path : serviceScan){
+            //检查包路径是否扫描范围内
+            if(pkgFullname.startsWith(path.trim())){
+                return true;
+            }
+        }
+        return false;
     }
 
 }

@@ -79,12 +79,9 @@ public class ControllerCommentProcessor extends CommentProcessor {
             //循环所有被注解的元素(类)
             for(Element classElement : set){
                 if(controllerScan != null) {
-                    String pkgFullname = ((Symbol.ClassSymbol) classElement).packge().fullname.toString();
-                    for(String path : controllerScan){
-                        //检查包路径不在扫描范围内，则不处理
-                        if(!pkgFullname.startsWith(path)){
-                            return false;
-                        }
+                    //检查元素的包名是否匹配路径,不匹配则直接放过
+                    if(!matchPackage(classElement)){
+                        return false;
                     }
                 }
                 if(StringUtils.isBlank(elementUtils.getDocComment(classElement))){
@@ -113,6 +110,22 @@ public class ControllerCommentProcessor extends CommentProcessor {
             }
         }
         return true;
+    }
+
+    /**
+     * 元素的包名是否匹配路径
+     * @param classElement
+     * @return
+     */
+    private boolean matchPackage(Element classElement){
+        String pkgFullname = ((Symbol.ClassSymbol) classElement).packge().fullname.toString();
+        for(String path : controllerScan){
+            //检查包路径是否扫描范围内
+            if(pkgFullname.startsWith(path.trim())){
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override

@@ -45,6 +45,7 @@ public abstract class CommentProcessor extends BaseProcessor {
      * @return 不通过返回false
      */
     protected boolean validClassComment(Element classElement){
+        //先检查类上的注释
         if(StringUtils.isBlank(elementUtils.getDocComment(classElement))){
             error(classElement, "%s需要添加JavaDoc注释！", ((Symbol.ClassSymbol) classElement).fullname);
             return false;

@@ -39,6 +39,7 @@ import com.sun.tools.javac.code.Attribute;
 import com.sun.tools.javac.code.Scope;
 import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.code.Type;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.processing.Processor;
 import javax.annotation.processing.RoundEnvironment;
@@ -88,7 +89,7 @@ public class DtoProcessor extends BaseProcessor {
             //演示获取FileObject
 //                FileObject fo = filer.getResource(StandardLocation.CLASS_OUTPUT, processingEnv.getElementUtils().getPackageOf(element).toString(), element.getSimpleName()+".java");
             //创建Java文件
-            JavaFile javaFile = JavaFile.builder(packageFullName, typeSpec).build();
+            JavaFile javaFile = JavaFile.builder(packageFullName, typeSpec).skipJavaLangImports(true).build();
             try {
                 javaFile.writeTo(new File(filePath));
             } catch (IOException e) {
@@ -112,6 +113,10 @@ public class DtoProcessor extends BaseProcessor {
         //构建类
         TypeSpec.Builder builder = TypeSpec.interfaceBuilder(simpleName)
                 .addModifiers(Modifier.PUBLIC);
+        String doc = elementUtils.getDocComment(element);
+        if(StringUtils.isNotBlank(doc)) {
+            builder.addJavadoc(doc);
+        }
         com.sun.tools.javac.util.List<Attribute.Compound> classAnnotationMirrors = ((Symbol.ClassSymbol) element).getAnnotationMirrors();
         //构建注解
         List<AnnotationSpec> annotationSpecs = new ArrayList<>(classAnnotationMirrors.size());
@@ -234,6 +239,10 @@ public class DtoProcessor extends BaseProcessor {
             });
             methodBuilder.addAnnotation(annotationSpecBuilder.build());
         }
+        String doc = elementUtils.getDocComment(methodSymbol);
+        if(StringUtils.isNotBlank(doc)) {
+            methodBuilder.addJavadoc(doc);
+        }
         builder.addMethod(methodBuilder.build());
     }
 
@@ -264,11 +273,16 @@ public class DtoProcessor extends BaseProcessor {
             getMethodBuilder.returns(typeName);
             setMethodBuilder.addParameter(typeName, fieldSimpleName);
         }
+        String doc = elementUtils.getDocComment(varSymbol);
+        if(StringUtils.isNotBlank(doc)) {
+            getMethodBuilder.addJavadoc(doc);
+        }
         //构建getter和setter
         MethodSpec getterSpec = getMethodBuilder.build();
         builder.addMethod(getterSpec);
         MethodSpec setterSpec = setMethodBuilder.build();
         builder.addMethod(setterSpec);
+
     }
 
     /**
